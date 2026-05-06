@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkCity - Search Vehicle</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="navbar-brand" th:href="@{/vehicles}">
+        <span class="brand-plus">+</span>
+        <span class="brand-text">ParkCity</span>
+    </a>
+    <ul class="nav-links">
+        <li><a href="#">HOME</a></li>
+        <li><a href="#">PARKING SLOTS</a></li>
+        <li><a th:href="@{/vehicles}" class="active">MY VEHICLES</a></li>
+        <li><a href="#">TICKETS</a></li>
+        <li><a href="#">PAYMENTS</a></li>
+    </ul>
+    <div style="display:flex; gap:0.75rem;">
+        <a th:href="@{/vehicles}" class="btn btn-outline-white">← Back</a>
+        <a th:href="@{/vehicles/add}" class="btn btn-primary">+ Add Vehicle</a>
+    </div>
+</nav>
+
+<div class="page-container">
+
+    <div class="page-header">
+        <h1 class="page-title">Search <span>Vehicle</span></h1>
+        <p class="page-subtitle">Find a vehicle by plate number or owner ID</p>
+    </div>
+
+    <div class="card">
+        <div class="search-tabs">
+            <span class="search-tab active" onclick="showTab('plate')" id="tab-plate">🔠 By Plate Number</span>
+            <span class="search-tab" onclick="showTab('owner')" id="tab-owner">👤 By Owner ID</span>
+        </div>
+
+        <div id="search-plate">
+            <form th:action="@{/vehicles/search/plate}" method="get">
+                <div class="search-row">
+                    <div class="form-group" style="flex:1;">
+                        <label for="plate">Plate Number</label>
+                        <input type="text" id="plate" name="plate" placeholder="e.g. CAR-1234" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">🔍 Search</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="search-owner" style="display:none;">
+            <form th:action="@{/vehicles/search/owner}" method="get">
+                <div class="search-row">
+                    <div class="form-group" style="flex:1;">
+                        <label for="ownerId">Owner ID</label>
+                        <input type="text" id="ownerId" name="ownerId" placeholder="e.g. IT25100132" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">🔍 Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Result: Single Vehicle (Plate Search) -->
+    <div th:if="${found != null}">
+        <div th:if="${found}" class="card" style="margin-top:1.5rem; border-color:rgba(34,197,94,0.3);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <h3 style="font-family:'Poppins',sans-serif; font-size:1.2rem; color:var(--accent-green);">Vehicle Found ✅</h3>
+                <span class="plate-badge" th:text="${vehicle.plateNumber}"></span>
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Owner ID</label>
+                    <div class="info-value" th:text="${vehicle.ownerId}"></div>
+                </div>
+                <div class="info-item">
+                    <label>Owner Name</label>
+                    <div class="info-value" th:text="${vehicle.ownerName}"></div>
+                </div>
+                <div class="info-item">
+                    <label>Vehicle Type</label>
+                    <div class="info-value" th:text="${vehicle.type}"></div>
+                </div>
+                <div class="info-item">
+                    <label>Model</label>
+                    <div class="info-value" th:text="${vehicle.model}"></div>
+                </div>
+                <div class="info-item">
+                    <label>Contact</label>
+                    <div class="info-value" th:text="${vehicle.contact}"></div>
+                </div>
+            </div>
+            <div style="display:flex; gap:0.75rem; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);">
+                <a th:href="@{/vehicles/edit/{p}(p=${vehicle.plateNumber})}" class="btn btn-edit">✏️ Edit</a>
+                <a th:href="@{/vehicles/delete/{p}(p=${vehicle.plateNumber})}" class="btn btn-delete">🗑 Remove</a>
+            </div>
+        </div>
+
+        <div th:unless="${found}" class="card" style="margin-top:1.5rem; text-align:center;">
+            <div class="empty-icon" style="font-size:2.5rem; margin-bottom:0.75rem; opacity:0.4;">🔍</div>
+            <p style="color:var(--text-muted);">No vehicle found with plate number
+                <strong style="color:var(--accent-green);" th:text="${searchedPlate}"></strong>
+            </p>
+            <a th:href="@{/vehicles/add}" class="btn btn-primary" style="margin-top:1rem;">+ Register This Vehicle</a>
+        </div>
+    </div>
+
+    <!-- Result: Owner Search -->
+    <div th:if="${ownerSearch}" style="margin-top:1.5rem;">
+        <h3 style="font-size:0.95rem; color:var(--text-muted); margin-bottom:1rem;">
+            Vehicles for Owner: <strong style="color:var(--accent-green);" th:text="${searchedOwner}"></strong>
+        </h3>
+        <div class="table-wrapper" th:if="${not #lists.isEmpty(vehicles)}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Plate Number</th>
+                        <th>Owner Name</th>
+                        <th>Type</th>
+                        <th>Model</th>
+                        <th>Contact</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="v : ${vehicles}">
+                        <td><span class="plate-badge" th:text="${v.plateNumber}"></span></td>
+                        <td th:text="${v.ownerName}" style="color:var(--text-secondary); font-weight:500;"></td>
+                        <td><span class="type-badge" th:text="${v.type}"></span></td>
+                        <td th:text="${v.model}"></td>
+                        <td th:text="${v.contact}"></td>
+                        <td>
+                            <a th:href="@{/vehicles/edit/{p}(p=${v.plateNumber})}" class="btn btn-edit btn-sm">✏️ Edit</a>
+                            <a th:href="@{/vehicles/delete/{p}(p=${v.plateNumber})}" class="btn btn-delete btn-sm">🗑 Remove</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card" th:if="${#lists.isEmpty(vehicles)}" style="text-align:center;">
+            <p style="color:var(--text-muted);">No vehicles found for this owner ID.</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function showTab(tab) {
+    document.getElementById('search-plate').style.display = tab === 'plate' ? 'block' : 'none';
+    document.getElementById('search-owner').style.display = tab === 'owner' ? 'block' : 'none';
+    document.getElementById('tab-plate').classList.toggle('active', tab === 'plate');
+    document.getElementById('tab-owner').classList.toggle('active', tab === 'owner');
+}
+</script>
+</body>
+</html>

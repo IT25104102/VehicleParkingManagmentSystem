@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkCity - Edit Vehicle</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="navbar-brand" th:href="@{/vehicles}">
+        <span class="brand-plus">+</span>
+        <span class="brand-text">ParkCity</span>
+    </a>
+    <ul class="nav-links">
+        <li><a href="#">HOME</a></li>
+        <li><a href="#">PARKING SLOTS</a></li>
+        <li><a th:href="@{/vehicles}" class="active">MY VEHICLES</a></li>
+        <li><a href="#">TICKETS</a></li>
+        <li><a href="#">PAYMENTS</a></li>
+    </ul>
+    <div style="display:flex; gap:0.75rem;">
+        <a th:href="@{/vehicles}" class="btn btn-outline-white">← Back</a>
+    </div>
+</nav>
+
+<div class="page-container">
+
+    <div class="page-header">
+        <h1 class="page-title">Edit <span>Vehicle Details</span></h1>
+        <p class="page-subtitle">
+            Updating record for:
+            <span style="color:var(--accent-green); font-weight:600;" th:text="${vehicle.plateNumber}"></span>
+        </p>
+    </div>
+
+    <div class="card">
+        <form th:action="@{/vehicles/edit/{p}(p=${vehicle.plateNumber})}" th:object="${vehicle}" method="post">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Plate Number (cannot change)</label>
+                    <input type="text" th:value="${vehicle.plateNumber}" disabled
+                           style="opacity:0.5; cursor:not-allowed;">
+                </div>
+
+                <div class="form-group">
+                    <label for="ownerId">Owner ID *</label>
+                    <input type="text" id="ownerId" th:field="*{ownerId}" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="ownerName">Owner Full Name *</label>
+                    <input type="text" id="ownerName" th:field="*{ownerName}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="type">Vehicle Type *</label>
+                    <select id="type" th:field="*{type}" required>
+                        <option value="Car" th:selected="${vehicle.type == 'Car'}">Car</option>
+                        <option value="Motorcycle" th:selected="${vehicle.type == 'Motorcycle'}">Motorcycle</option>
+                        <option value="Van" th:selected="${vehicle.type == 'Van'}">Van</option>
+                        <option value="Truck" th:selected="${vehicle.type == 'Truck'}">Truck</option>
+                        <option value="Bus" th:selected="${vehicle.type == 'Bus'}">Bus</option>
+                        <option value="Three Wheeler" th:selected="${vehicle.type == 'Three Wheeler'}">Three Wheeler</option>
+                        <option value="Other" th:selected="${vehicle.type == 'Other'}">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="model">Vehicle Model *</label>
+                    <input type="text" id="model" th:field="*{model}" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="contact">Owner Contact *</label>
+                    <input type="text" id="contact" th:field="*{contact}" required>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                <a th:href="@{/vehicles}" class="btn btn-outline">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+</body>
+</html>
