@@ -1,13 +1,15 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+ <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyParking | Digital Ticket</title>
+    <title>ParkCity | Digital Ticket</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         *{box-sizing:border-box;margin:0;padding:0}
         body{font-family:'Montserrat',sans-serif;background:radial-gradient(at top left,#1e3a8a 0%,#0a1128 50%),radial-gradient(at bottom right,#0d1117 0%,#010409 60%);background-attachment:fixed;color:#f0f6fc;min-height:100vh}
@@ -61,7 +63,7 @@
 
 <header class="main-header">
     <div class="top-bar">
-        <div class="logo"><span class="logo-icon">&#10018;</span> MyParking</div>
+        <div class="logo"><span class="logo-icon">&#10018;</span> ParkCity</div>
     </div>
     <nav class="full-width-nav">
         <ul>
@@ -141,8 +143,8 @@
         <strong>payment status</strong>.
     </div>
 
-    <button class="btn-primary" onclick="window.print()">
-        &#128438; Download / Print Ticket
+    <button class="btn-primary" onclick="downloadTicket()">
+        &#128438; Download Ticket
     </button>
     <a href="/payment/history" class="btn-outline">
         View Payment History
@@ -158,14 +160,54 @@
             <a href="#">Help</a>
         </div>
         <div class="f-col">
-            <a href="#">MyParking@gmail.com</a>
+            <a href="#">ParkCity@gmail.com</a>
             <a href="#">0712345678</a>
         </div>
     </div>
 </footer>
 
 <script>
-var qrData = 'MYPARKING'
+function downloadTicket() {
+    var elements = [
+        document.querySelector('.btn-primary'),
+        document.querySelector('.btn-outline'),
+        document.querySelector('.info-note'),
+        document.querySelector('footer'),
+        document.querySelector('.main-header'),
+        document.querySelector('.full-width-nav')
+    ];
+
+    elements.forEach(function(el) {
+        if(el) el.style.display = 'none';
+    });
+
+    var ticket = document.querySelector('.container');
+
+    html2canvas(ticket, {
+        backgroundColor: '#0a1128',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true
+    }).then(function(canvas) {
+        var imgData = canvas.toDataURL('image/png');
+        var pdf = new window.jspdf.jsPDF({
+            orientation: 'portrait',
+            unit: 'px',
+            format: [canvas.width / 2, canvas.height / 2]
+        });
+        pdf.addImage(
+            imgData, 'PNG', 0, 0,
+            canvas.width / 2,
+            canvas.height / 2
+        );
+        pdf.save('ParkCity-Ticket-${payment.id}.pdf');
+
+        elements.forEach(function(el) {
+            if(el) el.style.display = '';
+        });
+    });
+}
+var qrData = 'ParkCity'
     + '|ID:${payment.id}'
     + '|TICKET:${payment.ticketId}'
     + '|AMOUNT:Rs.${payment.amount}'
