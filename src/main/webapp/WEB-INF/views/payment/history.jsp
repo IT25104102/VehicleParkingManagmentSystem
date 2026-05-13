@@ -1,11 +1,11 @@
- <%@ page contentType="text/html;charset=UTF-8" %>
+  <%@ page contentType="text/html;charset=UTF-8" %>
  <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
  <!DOCTYPE html>
  <html lang="en">
  <head>
      <meta charset="UTF-8">
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>MyParking | Payment History</title>
+     <title>ParkCity | Payment History</title>
      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
      <style>
          *{box-sizing:border-box;margin:0;padding:0}
@@ -54,7 +54,7 @@
 
  <header class="main-header">
      <div class="top-bar">
-         <div class="logo"><span class="logo-icon">&#10018;</span> MyParking</div>
+         <div class="logo"><span class="logo-icon">&#10018;</span> ParkCity</div>
      </div>
      <nav class="full-width-nav">
          <ul>
@@ -143,7 +143,7 @@
              <a href="#">Help</a>
          </div>
          <div class="f-col">
-             <a href="#">MyParking@gmail.com</a>
+             <a href="#">ParkCity@gmail.com</a>
              <a href="#">0712345678</a>
          </div>
      </div>
