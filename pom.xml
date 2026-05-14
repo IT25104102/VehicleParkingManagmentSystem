@@ -9,11 +9,27 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
+
+        <version>3.2.0</version>
+
         <version>3.4.0</version>
+
         <relativePath/>
     </parent>
 
     <groupId>com.smartparking</groupId>
+
+    <artifactId>SmartParkingSystem</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>war</packaging>
+    <name>SmartParkingSystem</name>
+
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
+    <dependencies>
+
     <artifactId>smartparkingsystem</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
@@ -26,6 +42,7 @@
 
     <dependencies>
 
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -34,6 +51,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
+
+            <optional>true</optional>
+        </dependency>
+
+        <!-- JSP Support -->
+
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
@@ -44,10 +67,15 @@
             <scope>test</scope>
         </dependency>
 
+
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
         </dependency>
+
+
+        <!-- JSTL -->
+
 
         <dependency>
             <groupId>jakarta.servlet.jsp.jstl</groupId>
@@ -58,8 +86,22 @@
         <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.glassfish.web</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl</artifactId>
             <version>3.0.1</version>
         </dependency>
+
 
     </dependencies>
 
@@ -71,5 +113,9 @@
             </plugin>
         </plugins>
     </build>
+ 
+</project>
+ 
 
 </project>
+ 
