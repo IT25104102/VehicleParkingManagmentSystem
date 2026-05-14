@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkCity - Vehicle Registry</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <a class="navbar-brand" th:href="@{/vehicles}">
+        <span class="brand-plus">+</span>
+        <span class="brand-text">ParkCity</span>
+    </a>
+    <ul class="nav-links">
+        <li><a href="index.html">HOME</a></li>
+        <li><a href="#">PARKING SLOTS</a></li>
+        <li><a th:href="@{/vehicles}" class="active">MY VEHICLES</a></li>
+        <li><a href="#">TICKETS</a></li>
+        <li><a href="#">PAYMENTS</a></li>
+    </ul>
+    <div style="display:flex; gap:0.75rem;">
+        <a th:href="@{/vehicles/search}" class="btn btn-outline-white">🔍 Search</a>
+        <a th:href="@{/vehicles/add}" class="btn btn-primary">+ Add Vehicle</a>
+    </div>
+</nav>
+
+<div class="page-container">
+
+    <div class="page-header">
+        <h1 class="page-title">Vehicle <span>Registry</span></h1>
+        <p class="page-subtitle">Manage all registered vehicles in the ParkCity system</p>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success">
+        ✅ <span th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-error">
+        ❌ <span th:text="${errorMessage}"></span>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-number" th:text="${totalCount}">0</div>
+            <div class="stat-label">Total Vehicles</div>
+        </div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h2 style="font-size:1rem; color:var(--text-muted); font-weight:500; text-transform:uppercase; letter-spacing:0.5px;">Registered Vehicles</h2>
+        <div style="display:flex; gap:0.75rem;">
+            <a th:href="@{/vehicles/search}" class="btn btn-outline-white">🔍 Search</a>
+            <a th:href="@{/vehicles/add}" class="btn btn-primary">+ Add Vehicle</a>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Plate Number</th>
+                    <th>Owner ID</th>
+                    <th>Owner Name</th>
+                    <th>Type</th>
+                    <th>Model</th>
+                    <th>Contact</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="vehicle : ${vehicles}">
+                    <td><span class="plate-badge" th:text="${vehicle.plateNumber}"></span></td>
+                    <td th:text="${vehicle.ownerId}" style="color:var(--text-muted); font-size:0.8rem;"></td>
+                    <td th:text="${vehicle.ownerName}" style="color:var(--text-secondary); font-weight:500;"></td>
+                    <td><span class="type-badge" th:text="${vehicle.type}"></span></td>
+                    <td th:text="${vehicle.model}" style="color:var(--text-secondary);"></td>
+                    <td th:text="${vehicle.contact}" style="color:var(--text-secondary);"></td>
+                    <td>
+                        <div style="display:flex; gap:0.5rem;">
+                            <a th:href="@{/vehicles/edit/{p}(p=${vehicle.plateNumber})}" class="btn btn-edit">✏️ Edit</a>
+                            <a th:href="@{/vehicles/delete/{p}(p=${vehicle.plateNumber})}" class="btn btn-delete">🗑 Remove</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(vehicles)}">
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <div class="empty-icon">🚗</div>
+                            <p>No vehicles registered yet.</p>
+                            <a th:href="@{/vehicles/add}" class="btn btn-primary" style="margin-top:1rem;">+ Register First Vehicle</a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</body>
+</html>
