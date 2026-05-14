@@ -1,0 +1,209 @@
+/* ============================================================
+   ParkCity - Vehicle Registry Stylesheet
+   Author: De Silva M.A.G.G - IT25100132
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap');
+
+:root {
+    --bg-dark: #0a0f1e;
+    --bg-navy: #0d1530;
+    --bg-card: #111827;
+    --bg-card2: #1a2235;
+    --accent-green: #22c55e;
+    --accent-green-hover: #16a34a;
+    --accent-cyan: #00d4ff;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --success: #22c55e;
+    --text-primary: #ffffff;
+    --text-secondary: #cbd5e1;
+    --text-muted: #64748b;
+    --border: #1e2d45;
+    --border-light: #243352;
+    --navbar-bg: #060d1f;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    background-image:
+        radial-gradient(ellipse at 10% 0%, rgba(34, 197, 94, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 100%, rgba(0, 212, 255, 0.03) 0%, transparent 50%);
+}
+
+/* ── Navbar ─────────────────────────────────────────────── */
+.navbar {
+    background: var(--navbar-bg);
+    border-bottom: 2px solid var(--accent-green);
+    padding: 0 3rem;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+}
+
+.brand-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+}
+
+.brand-plus { color: var(--accent-green); }
+
+.nav-links {
+    display: flex;
+    gap: 0.25rem;
+    list-style: none;
+}
+
+.nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover, .nav-links a.active { color: var(--accent-green); }
+
+/* ── Page Layout ─────────────────────────────────────────── */
+.page-container { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+.page-header { margin-bottom: 2rem; }
+
+.page-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.page-title span { color: var(--accent-green); }
+.page-subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem; }
+
+/* ── Cards ───────────────────────────────────────────────── */
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; }
+
+/* ── Stats ───────────────────────────────────────────────── */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+
+.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; text-align: center; }
+
+.stat-number { font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 700; color: var(--accent-green); }
+
+.stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ── Alerts ──────────────────────────────────────────────── */
+.alert { padding: 0.875rem 1.25rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.6rem; animation: slideDown 0.3s ease; }
+
+.alert-success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: var(--success); }
+.alert-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); }
+
+/* ── Table ───────────────────────────────────────────────── */
+.table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+
+table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+
+thead th { background: var(--bg-card2); color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; font-size: 0.75rem; padding: 0.875rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(34,197,94,0.03); }
+
+td { padding: 0.875rem 1rem; vertical-align: middle; }
+
+.plate-badge { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: var(--accent-green); padding: 0.25rem 0.75rem; border-radius: 20px; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 0.875rem; letter-spacing: 0.5px; }
+
+.type-badge { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-secondary); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.8rem; }
+
+.empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
+.empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1.4rem; border-radius: 25px; font-size: 0.875rem; font-weight: 600; cursor: pointer; text-decoration: none; border: none; transition: all 0.2s; font-family: 'Poppins', sans-serif; letter-spacing: 0.3px; }
+
+.btn-primary { background: var(--accent-green); color: #000; }
+.btn-primary:hover { background: var(--accent-green-hover); transform: translateY(-1px); }
+
+.btn-outline { background: transparent; border: 2px solid var(--accent-green); color: var(--accent-green); }
+.btn-outline:hover { background: var(--accent-green); color: #000; }
+
+.btn-outline-white { background: transparent; border: 1px solid var(--border-light); color: var(--text-secondary); border-radius: 25px; }
+.btn-outline-white:hover { border-color: var(--accent-green); color: var(--accent-green); }
+
+.btn-edit { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: var(--warning); border-radius: 6px; padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+.btn-edit:hover { background: rgba(245,158,11,0.2); }
+
+.btn-delete { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: var(--danger); border-radius: 6px; padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+.btn-delete:hover { background: rgba(239,68,68,0.2); }
+
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+
+/* ── Forms ───────────────────────────────────────────────── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+
+.form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.form-group.full-width { grid-column: 1 / -1; }
+
+label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+input, select { background: var(--bg-navy); border: 1px solid var(--border); color: var(--text-primary); padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; font-family: 'Inter', sans-serif; transition: border-color 0.2s; width: 100%; }
+
+input:focus, select:focus { outline: none; border-color: var(--accent-green); box-shadow: 0 0 0 3px rgba(34,197,94,0.1); }
+
+select option { background: var(--bg-card); }
+
+.form-actions { display: flex; gap: 0.75rem; margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+
+/* ── Search ──────────────────────────────────────────────── */
+.search-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+
+.search-tab { padding: 0.5rem 1.1rem; border-radius: 25px; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--text-muted); border: 1px solid transparent; background: transparent; font-family: 'Poppins', sans-serif; transition: all 0.2s; text-decoration: none; }
+
+.search-tab.active, .search-tab:hover { color: #000; background: var(--accent-green); border-color: var(--accent-green); }
+
+.search-row { display: flex; gap: 0.75rem; align-items: flex-end; }
+.search-row input { flex: 1; }
+
+/* ── Delete Warning ──────────────────────────────────────── */
+.delete-warning { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: center; }
+.delete-warning .warn-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+.delete-warning p { color: var(--text-muted); font-size: 0.9rem; }
+
+/* ── Info Grid ───────────────────────────────────────────── */
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.25rem 0; }
+.info-item label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem; display: block; }
+.info-item .info-value { font-size: 0.95rem; color: var(--text-primary); font-weight: 500; }
+
+/* ── Animations ──────────────────────────────────────────── */
+@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .info-grid  { grid-template-columns: 1fr; }
+    .navbar { padding: 0 1rem; }
+    .nav-links { display: none; }
+}
