@@ -5,7 +5,7 @@ package com.parking.vehicle.model;
  * Each vehicle record stored in vehicles.txt as a pipe-separated line:
  * plateNumber|ownerId|ownerName|type|model|contact
  *
- * Author: De Silva M.A.G.G - IT25100132
+ *
  */
 public class Vehicle {
 

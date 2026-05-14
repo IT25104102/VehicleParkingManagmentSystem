@@ -12,10 +12,10 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * VehicleController handles HTTP requests for Vehicle Registry.
+ *  handles HTTP requests for Vehicle Registry.
  * Maps URLs to Thymeleaf HTML templates.
  *
- * Author: De Silva M.A.G.G - IT25100132
+ *
  */
 @Controller
 @RequestMapping("/vehicles")
