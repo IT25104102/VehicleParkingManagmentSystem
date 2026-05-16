@@ -1,4 +1,4 @@
-package com.parking.servlet;
+package com.smartparking.smartparkingsystem.servlet;
 
 import com.parking.model.Log;
 import com.parking.service.AdminService;
