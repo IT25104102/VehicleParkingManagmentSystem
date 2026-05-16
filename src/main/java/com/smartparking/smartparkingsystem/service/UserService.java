@@ -1,4 +1,4 @@
- package com.smartparking.smartparkingsystem.service;
+package com.smartparking.smartparkingsystem.service;
 
 import com.smartparking.smartparkingsystem.model.User;
 import com.smartparking.smartparkingsystem.util.FileUtil;
@@ -27,12 +27,12 @@ public class UserService {
         return "success";
     }
 
-    // READ — Login
-    public User login(String email, String password) {
+    // READ — Login — returns Optional
+    public Optional<User> login(String email, String password) {
         User user = findByEmail(email);
         if (user != null && user.getPassword()
-                .equals(password)) return user;
-        return null;
+                .equals(password)) return Optional.of(user);
+        return Optional.empty();
     }
 
     // READ — Get all users
@@ -62,6 +62,13 @@ public class UserService {
             if (u.getId().equals(id)) return u;
         }
         return null;
+    }
+
+    // READ — Get user by ID — returns Optional
+    public Optional<User> getUserById(String id) {
+        return getAllUsers().stream()
+                .filter(u -> u.getId().equals(id))
+                .findFirst();
     }
 
     // UPDATE — Change password
