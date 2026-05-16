@@ -15,11 +15,7 @@ public class TicketServlet {
     @Autowired
     private TicketService ticketService;
 
-    // HOME — Redirect to tickets
-    @GetMapping("/")
-    public String home() {
-        return "redirect:/tickets";
-    }
+
 
     // READ — List all active tickets
     @GetMapping("/tickets")
@@ -30,8 +26,8 @@ public class TicketServlet {
         model.addAttribute("activeCount", active.size());
         model.addAttribute("totalCount", all.size());
         model.addAttribute("voidedCount", all.stream()
-            .filter(t -> "VOIDED".equals(
-                t.getStatus())).count());
+                .filter(t -> "VOIDED".equals(
+                        t.getStatus())).count());
         return "tickets/ticket-list";
     }
 
@@ -39,7 +35,7 @@ public class TicketServlet {
     @GetMapping("/tickets/new")
     public String showCreateForm(Model model) {
         model.addAttribute("pageTitle",
-            "Generate Ticket");
+                "Generate Ticket");
         return "tickets/ticket-form";
     }
 
@@ -51,10 +47,10 @@ public class TicketServlet {
             @RequestParam String vehicleNumber,
             RedirectAttributes ra) {
         Ticket ticket = ticketService.generateTicket(
-            vehicleId, slotId, vehicleNumber);
+                vehicleId, slotId, vehicleNumber);
         ra.addFlashAttribute("successMsg",
-            "Ticket " + ticket.getId()
-            + " generated for " + vehicleNumber);
+                "Ticket " + ticket.getId()
+                        + " generated for " + vehicleNumber);
         return "redirect:/tickets";
     }
 
@@ -67,7 +63,7 @@ public class TicketServlet {
         if (ticket == null) return "redirect:/tickets";
         model.addAttribute("ticket", ticket);
         model.addAttribute("pageTitle",
-            "Ticket Details");
+                "Ticket Details");
         return "tickets/ticket-detail";
     }
 
@@ -80,7 +76,7 @@ public class TicketServlet {
         if (ticket == null) return "redirect:/tickets";
         model.addAttribute("ticket", ticket);
         model.addAttribute("pageTitle",
-            "Reassign Slot");
+                "Reassign Slot");
         return "tickets/edit-ticket";
     }
 
@@ -91,13 +87,13 @@ public class TicketServlet {
             @RequestParam String newSlotId,
             RedirectAttributes ra) {
         boolean ok = ticketService.updateTicketSlot(
-            id, newSlotId);
+                id, newSlotId);
         if (ok) {
             ra.addFlashAttribute("successMsg",
-                "Slot updated successfully!");
+                    "Slot updated successfully!");
         } else {
             ra.addFlashAttribute("errorMsg",
-                "Could not update ticket.");
+                    "Could not update ticket.");
         }
         return "redirect:/tickets";
     }
@@ -110,10 +106,10 @@ public class TicketServlet {
         boolean ok = ticketService.voidTicket(id);
         if (ok) {
             ra.addFlashAttribute("successMsg",
-                "Ticket voided successfully!");
+                    "Ticket voided successfully!");
         } else {
             ra.addFlashAttribute("errorMsg",
-                "Could not void ticket.");
+                    "Could not void ticket.");
         }
         return "redirect:/tickets";
     }
