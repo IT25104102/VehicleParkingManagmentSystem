@@ -1,4 +1,4 @@
-package com.parking.service;
+package com.smartparking.smartparkingsystem.service;
 
 import com.parking.model.Log;
 import com.parking.util.FileUtil;
