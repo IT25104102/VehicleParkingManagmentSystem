@@ -1,4 +1,4 @@
-package com.parking.model;
+package com.smartparking.smartparkingsystem.model;
 
 /**
  * Log.java — Data model representing a single daily summary log entry.
