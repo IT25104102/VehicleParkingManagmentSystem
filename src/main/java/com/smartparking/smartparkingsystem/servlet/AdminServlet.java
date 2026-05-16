@@ -1,4 +1,4 @@
- package com.smartparking.smartparkingsystem.servlet;
+package com.smartparking.smartparkingsystem.servlet;
 
 import com.smartparking.smartparkingsystem.model.Log;
 import com.smartparking.smartparkingsystem.service.AdminService;
@@ -48,4 +48,53 @@ public class AdminServlet {
                 + generatedLog.getDate()
                 + " — Vehicles: "
                 + generatedLog.getTotalVehicles()
-                + ", Inc
+                + ", Income: Rs."
+                + String.format("%.2f",
+                    generatedLog.getIncome()));
+        } else {
+            session.setAttribute("errorMessage",
+                "Failed to generate daily summary.");
+        }
+        return "redirect:/admin/dashboard";
+    }
+
+    // UPDATE — Price per hour
+    @PostMapping("/price")
+    public String updatePrice(
+            @RequestParam String price,
+            HttpSession session) {
+        try {
+            double newPrice = Double.parseDouble(price);
+            boolean updated =
+                adminService.updatePricePerHour(newPrice);
+            if (updated) {
+                session.setAttribute("successMessage",
+                    "Price updated to Rs."
+                    + String.format("%.2f", newPrice)
+                    + "/hour.");
+            } else {
+                session.setAttribute("errorMessage",
+                    "Failed to update price. Must be greater than 0.");
+            }
+        } catch (NumberFormatException e) {
+            session.setAttribute("errorMessage",
+                "Invalid price entered.");
+        }
+        return "redirect:/admin/price";
+    }
+
+    // DELETE — Clean old logs
+    @PostMapping("/clean")
+    public String cleanLogs(HttpSession session) {
+        int deleted = adminService.deleteOldLogs();
+        if (deleted >= 0) {
+            session.setAttribute("successMessage",
+                "Cleanup complete. Removed "
+                + deleted + " old log entries.");
+        } else {
+            session.setAttribute("errorMessage",
+                "Log cleanup failed.");
+        }
+        return "redirect:/admin/dashboard";
+    }
+}
