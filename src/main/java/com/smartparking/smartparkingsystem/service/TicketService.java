@@ -1,4 +1,4 @@
- package com.smartparking.smartparkingsystem.service;
+package com.smartparking.smartparkingsystem.service;
 
 import com.smartparking.smartparkingsystem.model.Ticket;
 import com.smartparking.smartparkingsystem.util.FileUtil;
@@ -19,10 +19,11 @@ public class TicketService {
         ticket.setId(FileUtil.generateId("TKT"));
         ticket.setVehicleId(vehicleId);
         ticket.setSlotId(slotId);
-        ticket.setVehicleNumber(vehicleNumber.toUpperCase());
-        ticket.setCheckInTime(LocalDateTime.now().toString());
+        ticket.setVehicleNumber(
+            vehicleNumber.toUpperCase());
+        ticket.setCheckInTime(LocalDateTime.now());
         ticket.setStatus("ACTIVE");
-        ticket.setCreatedAt(new Date().toString());
+        ticket.setCreatedAt(LocalDateTime.now());
         FileUtil.appendLine(FILE, ticket.toFileString());
         return ticket;
     }
@@ -32,9 +33,14 @@ public class TicketService {
         List<Ticket> list = new ArrayList<>();
         for (String line : FileUtil.readAll(FILE)) {
             if (line.trim().isEmpty()) continue;
-            Ticket t = new Ticket();
-            t.fromFileString(line);
-            list.add(t);
+            try {
+                Ticket t = new Ticket();
+                t.fromFileString(line);
+                list.add(t);
+            } catch (Exception e) {
+                System.err.println("Error reading ticket: "
+                    + e.getMessage());
+            }
         }
         return list;
     }
@@ -62,14 +68,18 @@ public class TicketService {
         boolean found = false;
         for (String line : lines) {
             if (line.trim().isEmpty()) continue;
-            Ticket t = new Ticket();
-            t.fromFileString(line);
-            if (t.getId().equals(ticketId)
-                    && "ACTIVE".equals(t.getStatus())) {
-                t.setSlotId(newSlotId);
-                updated.add(t.toFileString());
-                found = true;
-            } else {
+            try {
+                Ticket t = new Ticket();
+                t.fromFileString(line);
+                if (t.getId().equals(ticketId)
+                        && "ACTIVE".equals(t.getStatus())) {
+                    t.setSlotId(newSlotId);
+                    updated.add(t.toFileString());
+                    found = true;
+                } else {
+                    updated.add(line);
+                }
+            } catch (Exception e) {
                 updated.add(line);
             }
         }
@@ -84,16 +94,19 @@ public class TicketService {
         boolean found = false;
         for (String line : lines) {
             if (line.trim().isEmpty()) continue;
-            Ticket t = new Ticket();
-            t.fromFileString(line);
-            if (t.getId().equals(ticketId)
-                    && "ACTIVE".equals(t.getStatus())) {
-                t.setStatus("VOIDED");
-                t.setCheckOutTime(
-                    LocalDateTime.now().toString());
-                updated.add(t.toFileString());
-                found = true;
-            } else {
+            try {
+                Ticket t = new Ticket();
+                t.fromFileString(line);
+                if (t.getId().equals(ticketId)
+                        && "ACTIVE".equals(t.getStatus())) {
+                    t.setStatus("VOIDED");
+                    t.setCheckOutTime(LocalDateTime.now());
+                    updated.add(t.toFileString());
+                    found = true;
+                } else {
+                    updated.add(line);
+                }
+            } catch (Exception e) {
                 updated.add(line);
             }
         }
