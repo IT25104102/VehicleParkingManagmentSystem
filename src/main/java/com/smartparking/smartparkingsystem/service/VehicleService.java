@@ -1,88 +1,87 @@
-package com.smartparking.smartparkingsystem.service;
+ package com.smartparking.smartparkingsystem.service;
 
 import com.smartparking.smartparkingsystem.model.Vehicle;
 import com.smartparking.smartparkingsystem.util.FileUtil;
+import org.springframework.stereotype.Service;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@Service
 public class VehicleService {
 
-    private static final String FILE_PATH = "D:/Y1 S2/OOP/Vehicle project/SmartParkingSystem/data/vehicles.txt";
+    private static final String FILE = "data/vehicles.txt";
 
-    // ── CREATE ──────────────────────────────────────
+    // CREATE — Add vehicle
     public void addVehicle(Vehicle vehicle) {
-        vehicle.setVehicleId(generateId());
-        FileUtil.appendLine(FILE_PATH, vehicle.toFileString());
+        vehicle.setVehicleId(FileUtil.generateId("VEH"));
+        FileUtil.appendLine(FILE, vehicle.toFileString());
     }
 
-    // ── READ ALL ─────────────────────────────────────
+    // READ — Get all vehicles
     public List<Vehicle> getAllVehicles() {
-        List<String> lines = FileUtil.readLines(FILE_PATH);
-        List<Vehicle> vehicles = new ArrayList<>();
-        for (String line : lines) {
-            vehicles.add(Vehicle.fromFileString(line));
+        List<Vehicle> list = new ArrayList<>();
+        for (String line : FileUtil.readAll(FILE)) {
+            if (line.trim().isEmpty()) continue;
+            list.add(Vehicle.fromFileString(line));
         }
-        return vehicles;
+        return list;
     }
 
-    // ── READ ONE ─────────────────────────────────────
-    public Vehicle getVehicleById(String vehicleId) {
+    // READ — Find by ID
+    public Vehicle findById(String id) {
         for (Vehicle v : getAllVehicles()) {
-            if (v.getVehicleId().equals(vehicleId)) {
-                return v;
-            }
+            if (v.getVehicleId().equals(id)) return v;
         }
         return null;
     }
 
-    // ── SEARCH ───────────────────────────────────────
-    public List<Vehicle> searchVehicles(String keyword) {
-        if (keyword == null || keyword.trim().isEmpty()) {
+    // READ — Search
+    public List<Vehicle> searchVehicle(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty())
             return getAllVehicles();
-        }
         String lower = keyword.toLowerCase().trim();
         List<Vehicle> results = new ArrayList<>();
         for (Vehicle v : getAllVehicles()) {
-            if (v.getLicensePlate().toLowerCase().contains(lower)
-                    || v.getOwnerName().toLowerCase().contains(lower)) {
+            if (v.getLicensePlate().toLowerCase()
+                    .contains(lower)
+                || v.getOwnerName().toLowerCase()
+                    .contains(lower)) {
                 results.add(v);
             }
         }
         return results;
     }
 
-    // ── UPDATE ───────────────────────────────────────
-    public void updateVehicle(Vehicle updated) {
-        List<String> lines = FileUtil.readLines(FILE_PATH);
-        List<String> newLines = new ArrayList<>();
+    // UPDATE — Update vehicle
+    public void updateVehicle(String id,
+            String licensePlate, String ownerName,
+            String vehicleType) {
+        List<String> lines = FileUtil.readAll(FILE);
+        List<String> updated = new ArrayList<>();
         for (String line : lines) {
+            if (line.trim().isEmpty()) continue;
             Vehicle v = Vehicle.fromFileString(line);
-            if (v.getVehicleId().equals(updated.getVehicleId())) {
-                newLines.add(updated.toFileString());
+            if (v.getVehicleId().equals(id)) {
+                v.setLicensePlate(licensePlate);
+                v.setOwnerName(ownerName);
+                v.setVehicleType(vehicleType);
+                updated.add(v.toFileString());
             } else {
-                newLines.add(line);
+                updated.add(line);
             }
         }
-        FileUtil.writeLines(FILE_PATH, newLines);
+        FileUtil.writeAll(FILE, updated);
     }
 
-    // ── DELETE ───────────────────────────────────────
+    // DELETE — Remove vehicle
     public void deleteVehicle(String vehicleId) {
-        List<String> lines = FileUtil.readLines(FILE_PATH);
-        List<String> newLines = new ArrayList<>();
+        List<String> lines = FileUtil.readAll(FILE);
+        List<String> updated = new ArrayList<>();
         for (String line : lines) {
+            if (line.trim().isEmpty()) continue;
             Vehicle v = Vehicle.fromFileString(line);
-            if (!v.getVehicleId().equals(vehicleId)) {
-                newLines.add(line);
-            }
+            if (!v.getVehicleId().equals(vehicleId))
+                updated.add(line);
         }
-        FileUtil.writeLines(FILE_PATH, newLines);
-    }
-
-    // ── GENERATE ID ──────────────────────────────────
-    private String generateId() {
-        int next = getAllVehicles().size() + 1;
-        return String.format("V%03d", next);
+        FileUtil.writeAll(FILE, updated);
     }
 }
