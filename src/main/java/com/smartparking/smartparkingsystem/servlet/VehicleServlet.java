@@ -1,119 +1,82 @@
-package com.smartparking.smartparkingsystem.servlet;
+ package com.smartparking.smartparkingsystem.servlet;
 
 import com.smartparking.smartparkingsystem.model.Vehicle;
 import com.smartparking.smartparkingsystem.service.VehicleService;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.util.List;
+@Controller
+@RequestMapping("/vehicle")
+public class VehicleServlet {
 
-@WebServlet("/vehicle/*")
-public class VehicleServlet extends HttpServlet {
+    @Autowired
+    private VehicleService vehicleService;
 
-    private final VehicleService vehicleService = new VehicleService();
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        String action = request.getParameter("action");
-        if (action == null) action = "list";
-
-        switch (action) {
-            case "list":    showList(request, response);     break;
-            case "add":     showAddForm(request, response);  break;
-            case "edit":    showEditForm(request, response); break;
-            case "delete":  deleteVehicle(request, response);break;
-            default:        showList(request, response);
-        }
+    // READ — Show all vehicles
+    @GetMapping("/list")
+    public String list(Model model) {
+        model.addAttribute("vehicles",
+            vehicleService.getAllVehicles());
+        return "vehicle/list";
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        request.setCharacterEncoding("UTF-8");
-        String action = request.getParameter("action");
-        if (action == null) action = "list";
-
-        switch (action) {
-            case "add":  addVehicle(request, response);    break;
-            case "edit": updateVehicle(request, response); break;
-            default:
-                response.sendRedirect(request.getContextPath() + "/vehicle/?action=list");
-        }
+    // CREATE — Show add form
+    @GetMapping("/add")
+    public String showAdd() {
+        return "vehicle/add";
     }
 
-    private void showList(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        String search = request.getParameter("search");
-        List<Vehicle> vehicles;
-
-        if (search != null && !search.trim().isEmpty()) {
-            vehicles = vehicleService.searchVehicles(search);
-            request.setAttribute("search", search);
-        } else {
-            vehicles = vehicleService.getAllVehicles();
-        }
-
-        request.setAttribute("vehicles", vehicles);
-        request.getRequestDispatcher("/WEB-INF/views/vehicle/vehicle-list.jsp")
-                .forward(request, response);
+    // CREATE — Handle add
+    @PostMapping("/add")
+    public String add(@RequestParam String licensePlate,
+                      @RequestParam String ownerName,
+                      @RequestParam String vehicleType,
+                      @RequestParam String userId,
+                      Model model) {
+        Vehicle v = new Vehicle();
+        v.setLicensePlate(licensePlate);
+        v.setOwnerName(ownerName);
+        v.setVehicleType(vehicleType);
+        v.setUserId(userId);
+        vehicleService.addVehicle(v);
+        return "redirect:/vehicle/list";
     }
 
-    private void showAddForm(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/views/vehicle/add-vehicle.jsp")
-                .forward(request, response);
+    // UPDATE — Show update form
+    @GetMapping("/update")
+    public String showUpdate(@RequestParam String id,
+                             Model model) {
+        model.addAttribute("vehicle",
+            vehicleService.findById(id));
+        return "vehicle/update";
     }
 
-    private void addVehicle(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        Vehicle vehicle = new Vehicle();
-        vehicle.setOwnerName(request.getParameter("ownerName"));
-        vehicle.setLicensePlate(request.getParameter("licensePlate"));
-        vehicle.setVehicleType(request.getParameter("vehicleType"));
-        vehicle.setContactNumber(request.getParameter("contactNumber"));
-        vehicle.setStatus(request.getParameter("status"));
-        vehicleService.addVehicle(vehicle);
-        response.sendRedirect(request.getContextPath() + "/vehicle/?action=list");
+    // UPDATE — Handle update
+    @PostMapping("/update")
+    public String update(@RequestParam String id,
+                         @RequestParam String licensePlate,
+                         @RequestParam String ownerName,
+                         @RequestParam String vehicleType) {
+        vehicleService.updateVehicle(id,
+            licensePlate, ownerName, vehicleType);
+        return "redirect:/vehicle/list";
     }
 
-    private void showEditForm(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String vehicleId = request.getParameter("id");
-        Vehicle vehicle  = vehicleService.getVehicleById(vehicleId);
-        if (vehicle == null) {
-            response.sendRedirect(request.getContextPath() + "/vehicle/?action=list");
-            return;
-        }
-        request.setAttribute("vehicle", vehicle);
-        request.getRequestDispatcher("/WEB-INF/views/vehicle/edit-vehicle.jsp")
-                .forward(request, response);
+    // DELETE — Handle delete
+    @PostMapping("/delete")
+    public String delete(@RequestParam String id) {
+        vehicleService.deleteVehicle(id);
+        return "redirect:/vehicle/list";
     }
 
-    private void updateVehicle(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        Vehicle vehicle = new Vehicle();
-        vehicle.setVehicleId(request.getParameter("vehicleId"));
-        vehicle.setOwnerName(request.getParameter("ownerName"));
-        vehicle.setLicensePlate(request.getParameter("licensePlate"));
-        vehicle.setVehicleType(request.getParameter("vehicleType"));
-        vehicle.setContactNumber(request.getParameter("contactNumber"));
-        vehicle.setStatus(request.getParameter("status"));
-        vehicleService.updateVehicle(vehicle);
-        response.sendRedirect(request.getContextPath() + "/vehicle/?action=list");
-    }
-
-    private void deleteVehicle(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        String vehicleId = request.getParameter("id");
-        vehicleService.deleteVehicle(vehicleId);
-        response.sendRedirect(request.getContextPath() + "/vehicle/?action=list");
+    // READ — Search vehicle
+    @GetMapping("/search")
+    public String search(@RequestParam String query,
+                         Model model) {
+        model.addAttribute("vehicles",
+            vehicleService.searchVehicle(query));
+        return "vehicle/list";
     }
 }
