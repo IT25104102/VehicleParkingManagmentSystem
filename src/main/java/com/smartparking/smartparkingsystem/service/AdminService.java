@@ -1,7 +1,7 @@
 package com.smartparking.smartparkingsystem.service;
 
-import com.parking.model.Log;
-import com.parking.util.FileUtil;
+import com.smartparking.smartparkingsystem.model.Log;
+import com.smartparking.smartparkingsystem.util.FileUtil;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdminService {
-    private static final String BASE =
-            System.getProperty("user.dir") + "/src/main/webapp/data/";
+       private static final String BASE = "data/";
     private static final String LOGS_FILE     = BASE + "logs.txt";
     private static final String CONFIG_FILE   = BASE + "config.txt";
     private static final String USERS_FILE    = BASE + "users.txt";
@@ -90,7 +89,9 @@ public class AdminService {
     public boolean updatePricePerHour(double newPrice) {
         if (newPrice <= 0) return false;
         try {
-            FileUtil.writeAll(CONFIG_FILE, "price=" + newPrice);
+             List<String> lines = new ArrayList<>();
+lines.add("price=" + newPrice);
+FileUtil.writeAll(CONFIG_FILE, lines);
             return true;
         } catch (Exception e) {
             System.err.println("[AdminService] Error: " + e.getMessage());
