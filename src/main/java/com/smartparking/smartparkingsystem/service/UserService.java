@@ -1,95 +1,131 @@
-package com.smartparking.smartparkingsystem.service;
+ package com.smartparking.smartparkingsystem.service;
 
 import com.smartparking.smartparkingsystem.model.User;
-import com.smartparking.smartparkingsystem.util.FileHandler;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.smartparking.smartparkingsystem.util.FileUtil;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-/**
- * UserService - Business logic for User Profile Management
- * Author: Nadin P.G.K | IT25101876
- */
 @Service
 public class UserService {
 
-    @Autowired
-    private FileHandler fileHandler;
+    private static final String FILE = "data/users.txt";
 
-    // ─── CREATE ─────────────────────────────────────────────────────────────────
-
-    /**
-     * Register a new driver.
-     * @return "success" | "email_exists" | "error"
-     */
-    public String registerUser(String name, String email, String password, String phone) {
-        if (fileHandler.findByEmail(email).isPresent()) {
-            return "email_exists";
-        }
-        User user = new User(null, name, email, password, phone,
-                             "DRIVER", LocalDate.now().toString());
-        return fileHandler.addUser(user) ? "success" : "error";
+    // CREATE — Register new user
+    public String registerUser(String name, String email,
+            String password, String phone) {
+        if (findByEmail(email) != null) return "email_exists";
+        User user = new User();
+        user.setId(FileUtil.generateId("USR"));
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setPhone(phone);
+        user.setRole("DRIVER");
+        user.setCreatedAt(LocalDate.now().toString());
+        FileUtil.appendLine(FILE, user.toFileString());
+        return "success";
     }
 
-    // ─── READ / AUTH ─────────────────────────────────────────────────────────────
-
-    /**
-     * Authenticate a user by email + password.
-     * @return the User if credentials match, otherwise empty.
-     */
-    public Optional<User> login(String email, String password) {
-        return fileHandler.findByEmail(email)
-                .filter(u -> u.getPassword().equals(password));
+    // READ — Login
+    public User login(String email, String password) {
+        User user = findByEmail(email);
+        if (user != null && user.getPassword()
+                .equals(password)) return user;
+        return null;
     }
 
-    /** Get all users (for admin dashboard). */
+    // READ — Get all users
     public List<User> getAllUsers() {
-        return fileHandler.readAllUsers();
+        List<User> list = new ArrayList<>();
+        for (String line : FileUtil.readAll(FILE)) {
+            if (line.trim().isEmpty()) continue;
+            User u = new User();
+            u.fromFileString(line);
+            list.add(u);
+        }
+        return list;
     }
 
-    /** Find a user by ID. */
-    public Optional<User> getUserById(String id) {
-        return fileHandler.findById(id);
+    // READ — Find by email
+    public User findByEmail(String email) {
+        for (User u : getAllUsers()) {
+            if (u.getEmail().equalsIgnoreCase(email))
+                return u;
+        }
+        return null;
     }
 
-    // ─── UPDATE ─────────────────────────────────────────────────────────────────
-
-    /**
-     * Change password after verifying the old password.
-     * @return "success" | "wrong_password" | "not_found" | "error"
-     */
-    public String changePassword(String userId, String oldPassword, String newPassword) {
-        Optional<User> opt = fileHandler.findById(userId);
-        if (opt.isEmpty()) return "not_found";
-        User user = opt.get();
-        if (!user.getPassword().equals(oldPassword)) return "wrong_password";
-        user.setPassword(newPassword);
-        return fileHandler.updateUser(user) ? "success" : "error";
+    // READ — Find by ID
+    public User findById(String id) {
+        for (User u : getAllUsers()) {
+            if (u.getId().equals(id)) return u;
+        }
+        return null;
     }
 
-    /**
-     * Update contact number.
-     * @return "success" | "not_found" | "error"
-     */
-    public String updatePhone(String userId, String newPhone) {
-        Optional<User> opt = fileHandler.findById(userId);
-        if (opt.isEmpty()) return "not_found";
-        User user = opt.get();
-        user.setPhone(newPhone);
-        return fileHandler.updateUser(user) ? "success" : "error";
+    // UPDATE — Change password
+    public String changePassword(String userId,
+            String oldPassword, String newPassword) {
+        List<String> lines = FileUtil.readAll(FILE);
+        List<String> updated = new ArrayList<>();
+        boolean found = false;
+        for (String line : lines) {
+            if (line.trim().isEmpty()) continue;
+            User u = new User();
+            u.fromFileString(line);
+            if (u.getId().equals(userId)) {
+                if (!u.getPassword().equals(oldPassword))
+                    return "wrong_password";
+                u.setPassword(newPassword);
+                updated.add(u.toFileString());
+                found = true;
+            } else {
+                updated.add(line);
+            }
+        }
+        if (found) FileUtil.writeAll(FILE, updated);
+        return found ? "success" : "not_found";
     }
 
-    // ─── DELETE ─────────────────────────────────────────────────────────────────
+    // UPDATE — Change phone
+    public String updatePhone(String userId,
+            String newPhone) {
+        List<String> lines = FileUtil.readAll(FILE);
+        List<String> updated = new ArrayList<>();
+        boolean found = false;
+        for (String line : lines) {
+            if (line.trim().isEmpty()) continue;
+            User u = new User();
+            u.fromFileString(line);
+            if (u.getId().equals(userId)) {
+                u.setPhone(newPhone);
+                updated.add(u.toFileString());
+                found = true;
+            } else {
+                updated.add(line);
+            }
+        }
+        if (found) FileUtil.writeAll(FILE, updated);
+        return found ? "success" : "not_found";
+    }
 
-    /**
-     * Delete a user account.
-     * @return "success" | "not_found" | "error"
-     */
+    // DELETE — Remove user
     public String deleteUser(String userId) {
-        if (fileHandler.findById(userId).isEmpty()) return "not_found";
-        return fileHandler.deleteUser(userId) ? "success" : "error";
+        List<String> lines = FileUtil.readAll(FILE);
+        List<String> updated = new ArrayList<>();
+        boolean found = false;
+        for (String line : lines) {
+            if (line.trim().isEmpty()) continue;
+            User u = new User();
+            u.fromFileString(line);
+            if (!u.getId().equals(userId)) {
+                updated.add(line);
+            } else {
+                found = true;
+            }
+        }
+        if (found) FileUtil.writeAll(FILE, updated);
+        return found ? "success" : "not_found";
     }
 }
