@@ -86,18 +86,19 @@ public class AdminService {
     // ═══════════════════════════════════════════════════
     // 3. UPDATE — Modify Price Per Hour
     // ═══════════════════════════════════════════════════
-    public boolean updatePricePerHour(double newPrice) {
-        if (newPrice <= 0) return false;
-        try {
-             List<String> lines = new ArrayList<>();
-lines.add("price=" + newPrice);
-FileUtil.writeAll(CONFIG_FILE, lines);
-            return true;
-        } catch (Exception e) {
-            System.err.println("[AdminService] Error: " + e.getMessage());
-            return false;
-        }
+     public boolean updatePricePerHour(double newPrice) {
+    if (newPrice <= 0) return false;
+    try {
+        List<String> lines = new ArrayList<>();
+        lines.add("price=" + newPrice);
+        FileUtil.writeAll(CONFIG_FILE, lines);
+        return true;
+    } catch (Exception e) {
+        System.err.println("[AdminService] Error: " 
+            + e.getMessage());
+        return false;
     }
+}
 
     public double getCurrentPrice() {
         try {
@@ -143,8 +144,8 @@ FileUtil.writeAll(CONFIG_FILE, lines);
             StringBuilder sb = new StringBuilder();
             for (String line : keepLines) {
                 sb.append(line).append("\n");
-            }
-            FileUtil.writeAll(LOGS_FILE, sb.toString().trim());
+            } 
+               FileUtil.writeAll(LOGS_FILE, keepLines);
             return deleted;
 
         } catch (Exception e) {
