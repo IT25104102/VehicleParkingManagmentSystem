@@ -15,21 +15,6 @@ import java.util.Optional;
 /**
  * UserController - MVC Controller for User Profile Management
  * Author: Nadin P.G.K | IT25101876
- *
- * Routes:
- *   GET  /              → redirect to /login
- *   GET  /login         → login.jsp
- *   POST /login         → authenticate → home or error
- *   GET  /register      → register.jsp
- *   POST /register      → create user → login
- *   GET  /profile       → profile.jsp  (session required)
- *   POST /profile/update-password  → change password
- *   POST /profile/update-phone     → change phone
- *   POST /profile/delete           → delete own account
- *   GET  /admin/users   → admin: list all users
- *   POST /admin/delete  → admin: delete any user
- *   GET  /logout        → clear session → /login
- *   GET  /home          → home.jsp (session required)
  */
 @Controller
 public class UserServlet {
@@ -37,19 +22,18 @@ public class UserServlet {
     @Autowired
     private UserService userService;
 
-    // ─── Root ────────────────────────────────────────────────────────────────────
-
+    // ─── Root ─────────────────────────────────────────────────
     @GetMapping("/")
     public String root() {
         return "redirect:/login";
     }
 
-    // ─── LOGIN ───────────────────────────────────────────────────────────────────
-
+    // ─── LOGIN ────────────────────────────────────────────────
     @GetMapping("/login")
     public String loginPage(HttpSession session) {
-        if (session.getAttribute("loggedInUser") != null) return "redirect:/home";
-        return "login";
+        if (session.getAttribute("loggedInUser") != null)
+            return "redirect:/home";
+        return "user/login";
     }
 
     @PostMapping("/login")
@@ -62,16 +46,17 @@ public class UserServlet {
             session.setAttribute("loggedInUser", opt.get());
             return "redirect:/home";
         }
-        ra.addFlashAttribute("error", "Invalid email or password. Please try again.");
+        ra.addFlashAttribute("error",
+                "Invalid email or password. Please try again.");
         return "redirect:/login";
     }
 
-    // ─── REGISTER ────────────────────────────────────────────────────────────────
-
+    // ─── REGISTER ─────────────────────────────────────────────
     @GetMapping("/register")
     public String registerPage(HttpSession session) {
-        if (session.getAttribute("loggedInUser") != null) return "redirect:/home";
-        return "register";
+        if (session.getAttribute("loggedInUser") != null)
+            return "redirect:/home";
+        return "user/register";
     }
 
     @PostMapping("/register")
@@ -80,7 +65,8 @@ public class UserServlet {
                                  @RequestParam String password,
                                  @RequestParam String phone,
                                  RedirectAttributes ra) {
-        String result = userService.registerUser(name, email, password, phone);
+        String result = userService.registerUser(
+                name, email, password, phone);
         switch (result) {
             case "success":
                 ra.addFlashAttribute("success",
@@ -97,29 +83,27 @@ public class UserServlet {
         }
     }
 
-    // ─── HOME ────────────────────────────────────────────────────────────────────
-
+    // ─── HOME ─────────────────────────────────────────────────
     @GetMapping("/home")
     public String homePage(HttpSession session, Model model) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) return "redirect:/login";
         model.addAttribute("user", user);
-        return "home";
+        return "user/home";
     }
 
-    // ─── PROFILE ─────────────────────────────────────────────────────────────────
-
+    // ─── PROFILE ──────────────────────────────────────────────
     @GetMapping("/profile")
     public String profilePage(HttpSession session, Model model) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) return "redirect:/login";
-        // Refresh from file to get latest data
         userService.getUserById(user.getId()).ifPresent(u -> {
             session.setAttribute("loggedInUser", u);
             model.addAttribute("user", u);
         });
-        if (model.getAttribute("user") == null) model.addAttribute("user", user);
-        return "profile";
+        if (model.getAttribute("user") == null)
+            model.addAttribute("user", user);
+        return "user/profile";
     }
 
     @PostMapping("/profile/update-password")
@@ -132,27 +116,32 @@ public class UserServlet {
         if (user == null) return "redirect:/login";
 
         if (!newPassword.equals(confirmPassword)) {
-            ra.addFlashAttribute("pwError", "New passwords do not match.");
+            ra.addFlashAttribute("pwError",
+                    "New passwords do not match.");
             return "redirect:/profile";
         }
         if (newPassword.length() < 6) {
-            ra.addFlashAttribute("pwError", "Password must be at least 6 characters.");
+            ra.addFlashAttribute("pwError",
+                    "Password must be at least 6 characters.");
             return "redirect:/profile";
         }
 
-        String result = userService.changePassword(user.getId(), oldPassword, newPassword);
+        String result = userService.changePassword(
+                user.getId(), oldPassword, newPassword);
         switch (result) {
             case "success":
-                // Update session
                 user.setPassword(newPassword);
                 session.setAttribute("loggedInUser", user);
-                ra.addFlashAttribute("pwSuccess", "Password updated successfully.");
+                ra.addFlashAttribute("pwSuccess",
+                        "Password updated successfully.");
                 break;
             case "wrong_password":
-                ra.addFlashAttribute("pwError", "Current password is incorrect.");
+                ra.addFlashAttribute("pwError",
+                        "Current password is incorrect.");
                 break;
             default:
-                ra.addFlashAttribute("pwError", "Update failed. Please try again.");
+                ra.addFlashAttribute("pwError",
+                        "Update failed. Please try again.");
         }
         return "redirect:/profile";
     }
@@ -164,44 +153,50 @@ public class UserServlet {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) return "redirect:/login";
 
-        String result = userService.updatePhone(user.getId(), phone);
+        String result = userService.updatePhone(
+                user.getId(), phone);
         if ("success".equals(result)) {
             user.setPhone(phone);
             session.setAttribute("loggedInUser", user);
-            ra.addFlashAttribute("phoneSuccess", "Contact number updated.");
+            ra.addFlashAttribute("phoneSuccess",
+                    "Contact number updated.");
         } else {
-            ra.addFlashAttribute("phoneError", "Update failed. Please try again.");
+            ra.addFlashAttribute("phoneError",
+                    "Update failed. Please try again.");
         }
         return "redirect:/profile";
     }
 
     @PostMapping("/profile/delete")
-    public String deleteOwnAccount(HttpSession session, RedirectAttributes ra) {
+    public String deleteOwnAccount(HttpSession session,
+                                   RedirectAttributes ra) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) return "redirect:/login";
 
         String result = userService.deleteUser(user.getId());
         if ("success".equals(result)) {
             session.invalidate();
-            ra.addFlashAttribute("success", "Your account has been deleted.");
+            ra.addFlashAttribute("success",
+                    "Your account has been deleted.");
             return "redirect:/login";
         }
-        ra.addFlashAttribute("deleteError", "Could not delete account. Try again.");
+        ra.addFlashAttribute("deleteError",
+                "Could not delete account. Try again.");
         return "redirect:/profile";
     }
 
-    // ─── ADMIN ───────────────────────────────────────────────────────────────────
-
+    // ─── ADMIN ────────────────────────────────────────────────
     @GetMapping("/admin/users")
     public String adminUsers(HttpSession session, Model model) {
         User admin = (User) session.getAttribute("loggedInUser");
         if (admin == null) return "redirect:/login";
-        if (!"ADMIN".equals(admin.getRole())) return "redirect:/home";
+        if (!"ADMIN".equals(admin.getRole()))
+            return "redirect:/home";
 
         List<User> users = userService.getAllUsers();
         model.addAttribute("users", users);
         model.addAttribute("user", admin);
-        return "admin-users";
+        return "user/admin-users";
     }
 
     @PostMapping("/admin/delete")
@@ -210,24 +205,27 @@ public class UserServlet {
                                   RedirectAttributes ra) {
         User admin = (User) session.getAttribute("loggedInUser");
         if (admin == null) return "redirect:/login";
-        if (!"ADMIN".equals(admin.getRole())) return "redirect:/home";
+        if (!"ADMIN".equals(admin.getRole()))
+            return "redirect:/home";
 
         if (userId.equals(admin.getId())) {
-            ra.addFlashAttribute("error", "You cannot delete your own admin account.");
+            ra.addFlashAttribute("error",
+                    "You cannot delete your own admin account.");
             return "redirect:/admin/users";
         }
 
         String result = userService.deleteUser(userId);
         if ("success".equals(result)) {
-            ra.addFlashAttribute("success", "User deleted successfully.");
+            ra.addFlashAttribute("success",
+                    "User deleted successfully.");
         } else {
-            ra.addFlashAttribute("error", "Could not delete user.");
+            ra.addFlashAttribute("error",
+                    "Could not delete user.");
         }
         return "redirect:/admin/users";
     }
 
-    // ─── LOGOUT ──────────────────────────────────────────────────────────────────
-
+    // ─── LOGOUT ───────────────────────────────────────────────
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
