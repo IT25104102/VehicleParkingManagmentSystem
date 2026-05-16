@@ -1,8 +1,8 @@
 package com.smartparking.smartparkingsystem.servlet;
 
-import com.parking.model.Log;
-import com.parking.service.AdminService;
-import com.parking.service.AdminService.SystemReport;
+import com.smartparking.smartparkingsystem.model.Log;
+import com.smartparking.smartparkingsystem.service.AdminService;
+import com.smartparking.smartparkingsystem.service.AdminService.SystemReport;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
