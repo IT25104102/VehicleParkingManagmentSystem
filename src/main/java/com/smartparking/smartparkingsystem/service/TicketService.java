@@ -1,10 +1,8 @@
-package com.smartparking.smartparkingsystem.service;
+ package com.smartparking.smartparkingsystem.service;
 
 import com.smartparking.smartparkingsystem.model.Ticket;
-import com.smartparking.smartparkingsystem.util.FileHandler;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.smartparking.smartparkingsystem.util.FileUtil;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,77 +10,94 @@ import java.util.stream.Collectors;
 @Service
 public class TicketService {
 
-    @Autowired
-    private FileHandler fileHandler;
+    private static final String FILE = "data/tickets.txt";
 
-    // ── CREATE — Generate new ticket ──────────────────────────
-    public Ticket generateTicket(String vehicleId, String slotId, String vehicleNumber) {
+    // CREATE — Generate new ticket
+    public Ticket generateTicket(String vehicleId,
+            String slotId, String vehicleNumber) {
         Ticket ticket = new Ticket();
-        ticket.setId("TKT-" + System.currentTimeMillis());
+        ticket.setId(FileUtil.generateId("TKT"));
         ticket.setVehicleId(vehicleId);
         ticket.setSlotId(slotId);
         ticket.setVehicleNumber(vehicleNumber.toUpperCase());
-        ticket.setCheckInTime(LocalDateTime.now());
-        ticket.setStatus(Ticket.STATUS_ACTIVE);
-        ticket.setCreatedAt(LocalDateTime.now());
-
-        fileHandler.appendTicket(ticket);
+        ticket.setCheckInTime(LocalDateTime.now().toString());
+        ticket.setStatus("ACTIVE");
+        ticket.setCreatedAt(new Date().toString());
+        FileUtil.appendLine(FILE, ticket.toFileString());
         return ticket;
     }
 
-    // ── READ — Get all tickets ────────────────────────────────
+    // READ — Get all tickets
     public List<Ticket> getAllTickets() {
-        return fileHandler.readAllTickets();
+        List<Ticket> list = new ArrayList<>();
+        for (String line : FileUtil.readAll(FILE)) {
+            if (line.trim().isEmpty()) continue;
+            Ticket t = new Ticket();
+            t.fromFileString(line);
+            list.add(t);
+        }
+        return list;
     }
 
-    // ── READ — Get only ACTIVE tickets ────────────────────────
+    // READ — Get active tickets
     public List<Ticket> getActiveTickets() {
-        return fileHandler.readAllTickets().stream()
-                .filter(t -> Ticket.STATUS_ACTIVE.equals(t.getStatus()))
-                .collect(Collectors.toList());
+        return getAllTickets().stream()
+            .filter(t -> "ACTIVE".equals(t.getStatus()))
+            .collect(Collectors.toList());
     }
 
-    // ── READ — Get ticket by ID ───────────────────────────────
-    public Optional<Ticket> getTicketById(String id) {
-        return fileHandler.readAllTickets().stream()
-                .filter(t -> t.getId().equals(id))
-                .findFirst();
+    // READ — Find by ID
+    public Ticket findById(String id) {
+        for (Ticket t : getAllTickets()) {
+            if (t.getId().equals(id)) return t;
+        }
+        return null;
     }
 
-    // ── UPDATE — Reassign parking slot ────────────────────────
-    public boolean updateTicketSlot(String ticketId, String newSlotId) {
-        List<Ticket> tickets = fileHandler.readAllTickets();
+    // UPDATE — Reassign slot
+    public boolean updateTicketSlot(String ticketId,
+            String newSlotId) {
+        List<String> lines = FileUtil.readAll(FILE);
+        List<String> updated = new ArrayList<>();
         boolean found = false;
-
-        for (Ticket t : tickets) {
+        for (String line : lines) {
+            if (line.trim().isEmpty()) continue;
+            Ticket t = new Ticket();
+            t.fromFileString(line);
             if (t.getId().equals(ticketId)
-                    && Ticket.STATUS_ACTIVE.equals(t.getStatus())) {
+                    && "ACTIVE".equals(t.getStatus())) {
                 t.setSlotId(newSlotId);
+                updated.add(t.toFileString());
                 found = true;
-                break;
+            } else {
+                updated.add(line);
             }
         }
-
-        if (found) fileHandler.writeAllTickets(tickets);
+        if (found) FileUtil.writeAll(FILE, updated);
         return found;
     }
 
-    // ── DELETE — Void a ticket ────────────────────────────────
+    // DELETE — Void ticket
     public boolean voidTicket(String ticketId) {
-        List<Ticket> tickets = fileHandler.readAllTickets();
+        List<String> lines = FileUtil.readAll(FILE);
+        List<String> updated = new ArrayList<>();
         boolean found = false;
-
-        for (Ticket t : tickets) {
+        for (String line : lines) {
+            if (line.trim().isEmpty()) continue;
+            Ticket t = new Ticket();
+            t.fromFileString(line);
             if (t.getId().equals(ticketId)
-                    && Ticket.STATUS_ACTIVE.equals(t.getStatus())) {
-                t.setStatus(Ticket.STATUS_VOIDED);
-                t.setCheckOutTime(LocalDateTime.now());
+                    && "ACTIVE".equals(t.getStatus())) {
+                t.setStatus("VOIDED");
+                t.setCheckOutTime(
+                    LocalDateTime.now().toString());
+                updated.add(t.toFileString());
                 found = true;
-                break;
+            } else {
+                updated.add(line);
             }
         }
-
-        if (found) fileHandler.writeAllTickets(tickets);
+        if (found) FileUtil.writeAll(FILE, updated);
         return found;
     }
 }
