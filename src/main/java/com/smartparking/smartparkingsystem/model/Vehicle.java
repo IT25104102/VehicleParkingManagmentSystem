@@ -44,6 +44,8 @@ public class Vehicle {
     public void setStatus(String status)               { this.status = status; }
     public void setUserId(String userId)               { this.userId = userId; }
 
+    // ── INSIDE the class ──────────────────────────────────────
+
     // Convert Vehicle object → one line of text for saving in vehicles.txt
     public String toFileString() {
         return vehicleId     + "|" +
