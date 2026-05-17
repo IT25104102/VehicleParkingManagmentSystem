@@ -1,9 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="com.parking.service.AdminService.SystemReport" %>
-<%@ page import="com.parking.model.Log" %>
+<%@ page import="com.smartparking.smartparkingsystem.service.AdminService" %>
+<%@ page import="com.smartparking.smartparkingsystem.model.Log" %>
 <%@ page import="java.util.*" %>
 <%
-    SystemReport report = (SystemReport) request.getAttribute("report");
+    AdminService.SystemReport report = (AdminService.SystemReport) request.getAttribute("report");
     String successMsg = (String) session.getAttribute("successMessage");
     String errorMsg   = (String) session.getAttribute("errorMessage");
     session.removeAttribute("successMessage");
@@ -14,7 +14,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ParkCity | Admin Dashboard</title>
+    <title>MyParking | Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -79,6 +79,10 @@
         .modal-box h5{font-size:1rem;font-weight:800;margin-bottom:10px}
         .modal-box p{font-size:0.85rem;color:#b8c7e0;margin-bottom:20px;line-height:1.6}
         .modal-actions{display:flex;gap:10px;justify-content:flex-end}
+
+        /* Logout button */
+        .btn-logout{width:calc(100% - 32px);margin:8px 16px;padding:9px 20px;background:transparent;border:1px solid rgba(255,107,107,0.4);border-radius:20px;font-family:'Montserrat',sans-serif;font-size:0.8rem;font-weight:700;color:#ff6b6b;cursor:pointer;transition:0.3s;text-align:center;display:block}
+        .btn-logout:hover{background:rgba(255,107,107,0.1);border-color:#ff6b6b}
     </style>
 </head>
 <body>
@@ -86,7 +90,7 @@
 <nav class="sidebar">
     <div class="sidebar-brand">
         <span class="logo-icon">&#10018;</span>
-        <h1>ParkCity</h1>
+        <h1>MyParking</h1>
         <p>Admin Control Panel</p>
     </div>
     <div class="nav-section">Navigation</div>
@@ -99,9 +103,18 @@
     <a href="<%= request.getContextPath() %>/admin/price" class="nav-link">
         <i class="fas fa-tag"></i> Pricing
     </a>
+    <a href="<%= request.getContextPath() %>/slots/manage" class="nav-link">
+        <i class="fas fa-parking"></i> Manage Slots
+    </a>
+    <a href="<%= request.getContextPath() %>/admin/users" class="nav-link">
+        <i class="fas fa-users"></i> Manage Users
+    </a>
     <div class="sidebar-footer">
         &#128994; System Online | Admin
     </div>
+    <a href="<%= request.getContextPath() %>/logout" class="btn-logout">
+        <i class="fas fa-sign-out-alt"></i> Log Out
+    </a>
 </nav>
 
 <main class="main">
