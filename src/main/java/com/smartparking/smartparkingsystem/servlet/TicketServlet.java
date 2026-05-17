@@ -43,7 +43,7 @@ public class TicketServlet {
     @PostMapping("/tickets/create")
     public String createTicket(
             @RequestParam String vehicleId,
-            @RequestParam String slotId,
+            @RequestParam (required = false)String slotId,
             @RequestParam String vehicleNumber,
             RedirectAttributes ra) {
         Ticket ticket = ticketService.generateTicket(
