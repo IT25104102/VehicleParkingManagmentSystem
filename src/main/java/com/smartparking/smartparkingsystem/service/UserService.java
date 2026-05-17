@@ -10,6 +10,7 @@ import java.util.*;
 public class UserService {
 
     private static final String FILE = "data/users.txt";
+    private static final String ADMIN_DOMAIN = "@parkcity.lk";
 
     // CREATE — Register new user
     public String registerUser(String name, String email,
@@ -21,7 +22,12 @@ public class UserService {
         user.setEmail(email);
         user.setPassword(password);
         user.setPhone(phone);
-        user.setRole("DRIVER");
+        // Auto assign role based on email domain
+        if (email != null && email.toLowerCase().endsWith(ADMIN_DOMAIN)) {
+            user.setRole("ADMIN");
+        } else {
+            user.setRole("DRIVER");
+        }
         user.setCreatedAt(LocalDate.now().toString());
         FileUtil.appendLine(FILE, user.toFileString());
         return "success";
@@ -96,8 +102,7 @@ public class UserService {
     }
 
     // UPDATE — Change phone
-    public String updatePhone(String userId,
-            String newPhone) {
+    public String updatePhone(String userId, String newPhone) {
         List<String> lines = FileUtil.readAll(FILE);
         List<String> updated = new ArrayList<>();
         boolean found = false;
