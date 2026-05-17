@@ -1,4 +1,4 @@
- package com.smartparking.smartparkingsystem.servlet;
+package com.smartparking.smartparkingsystem.servlet;
 
 import com.smartparking.smartparkingsystem.model.Vehicle;
 import com.smartparking.smartparkingsystem.service.VehicleService;
@@ -19,13 +19,13 @@ public class VehicleServlet {
     public String list(Model model) {
         model.addAttribute("vehicles",
             vehicleService.getAllVehicles());
-        return "vehicle/list";
+        return "Vehicle/vehicle-list";
     }
 
     // CREATE — Show add form
     @GetMapping("/add")
     public String showAdd() {
-        return "vehicle/add";
+        return "Vehicle/add-vehicle";
     }
 
     // CREATE — Handle add
@@ -50,7 +50,7 @@ public class VehicleServlet {
                              Model model) {
         model.addAttribute("vehicle",
             vehicleService.findById(id));
-        return "vehicle/update";
+        return "Vehicle/edit-vehicle";
     }
 
     // UPDATE — Handle update
@@ -77,6 +77,6 @@ public class VehicleServlet {
                          Model model) {
         model.addAttribute("vehicles",
             vehicleService.searchVehicle(query));
-        return "vehicle/list";
+        return "Vehicle/vehicle-list";
     }
 }
