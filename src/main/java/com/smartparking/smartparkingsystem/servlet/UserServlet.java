@@ -43,8 +43,15 @@ public class UserServlet {
                               RedirectAttributes ra) {
         Optional<User> opt = userService.login(email, password);
         if (opt.isPresent()) {
-            session.setAttribute("loggedInUser", opt.get());
-            return "redirect:/home";
+            User user = opt.get();
+            session.setAttribute("loggedInUser", user);
+
+            // Redirect based on role
+            if ("ADMIN".equals(user.getRole())) {
+                return "redirect:/admin/dashboard";
+            } else {
+                return "redirect:/home";
+            }
         }
         ra.addFlashAttribute("error",
                 "Invalid email or password. Please try again.");
@@ -88,6 +95,9 @@ public class UserServlet {
     public String homePage(HttpSession session, Model model) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) return "redirect:/login";
+        // Admin should not access customer home
+        if ("ADMIN".equals(user.getRole()))
+            return "redirect:/admin/dashboard";
         model.addAttribute("user", user);
         return "user/home";
     }
@@ -116,13 +126,11 @@ public class UserServlet {
         if (user == null) return "redirect:/login";
 
         if (!newPassword.equals(confirmPassword)) {
-            ra.addFlashAttribute("pwError",
-                    "New passwords do not match.");
+            ra.addFlashAttribute("pwError", "New passwords do not match.");
             return "redirect:/profile";
         }
         if (newPassword.length() < 6) {
-            ra.addFlashAttribute("pwError",
-                    "Password must be at least 6 characters.");
+            ra.addFlashAttribute("pwError", "Password must be at least 6 characters.");
             return "redirect:/profile";
         }
 
@@ -132,16 +140,13 @@ public class UserServlet {
             case "success":
                 user.setPassword(newPassword);
                 session.setAttribute("loggedInUser", user);
-                ra.addFlashAttribute("pwSuccess",
-                        "Password updated successfully.");
+                ra.addFlashAttribute("pwSuccess", "Password updated successfully.");
                 break;
             case "wrong_password":
-                ra.addFlashAttribute("pwError",
-                        "Current password is incorrect.");
+                ra.addFlashAttribute("pwError", "Current password is incorrect.");
                 break;
             default:
-                ra.addFlashAttribute("pwError",
-                        "Update failed. Please try again.");
+                ra.addFlashAttribute("pwError", "Update failed. Please try again.");
         }
         return "redirect:/profile";
     }
@@ -153,35 +158,29 @@ public class UserServlet {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) return "redirect:/login";
 
-        String result = userService.updatePhone(
-                user.getId(), phone);
+        String result = userService.updatePhone(user.getId(), phone);
         if ("success".equals(result)) {
             user.setPhone(phone);
             session.setAttribute("loggedInUser", user);
-            ra.addFlashAttribute("phoneSuccess",
-                    "Contact number updated.");
+            ra.addFlashAttribute("phoneSuccess", "Contact number updated.");
         } else {
-            ra.addFlashAttribute("phoneError",
-                    "Update failed. Please try again.");
+            ra.addFlashAttribute("phoneError", "Update failed. Please try again.");
         }
         return "redirect:/profile";
     }
 
     @PostMapping("/profile/delete")
-    public String deleteOwnAccount(HttpSession session,
-                                   RedirectAttributes ra) {
+    public String deleteOwnAccount(HttpSession session, RedirectAttributes ra) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) return "redirect:/login";
 
         String result = userService.deleteUser(user.getId());
         if ("success".equals(result)) {
             session.invalidate();
-            ra.addFlashAttribute("success",
-                    "Your account has been deleted.");
+            ra.addFlashAttribute("success", "Your account has been deleted.");
             return "redirect:/login";
         }
-        ra.addFlashAttribute("deleteError",
-                "Could not delete account. Try again.");
+        ra.addFlashAttribute("deleteError", "Could not delete account. Try again.");
         return "redirect:/profile";
     }
 
@@ -190,9 +189,7 @@ public class UserServlet {
     public String adminUsers(HttpSession session, Model model) {
         User admin = (User) session.getAttribute("loggedInUser");
         if (admin == null) return "redirect:/login";
-        if (!"ADMIN".equals(admin.getRole()))
-            return "redirect:/home";
-
+        if (!"ADMIN".equals(admin.getRole())) return "redirect:/home";
         List<User> users = userService.getAllUsers();
         model.addAttribute("users", users);
         model.addAttribute("user", admin);
@@ -205,22 +202,18 @@ public class UserServlet {
                                   RedirectAttributes ra) {
         User admin = (User) session.getAttribute("loggedInUser");
         if (admin == null) return "redirect:/login";
-        if (!"ADMIN".equals(admin.getRole()))
-            return "redirect:/home";
+        if (!"ADMIN".equals(admin.getRole())) return "redirect:/home";
 
         if (userId.equals(admin.getId())) {
-            ra.addFlashAttribute("error",
-                    "You cannot delete your own admin account.");
+            ra.addFlashAttribute("error", "You cannot delete your own admin account.");
             return "redirect:/admin/users";
         }
 
         String result = userService.deleteUser(userId);
         if ("success".equals(result)) {
-            ra.addFlashAttribute("success",
-                    "User deleted successfully.");
+            ra.addFlashAttribute("success", "User deleted successfully.");
         } else {
-            ra.addFlashAttribute("error",
-                    "Could not delete user.");
+            ra.addFlashAttribute("error", "Could not delete user.");
         }
         return "redirect:/admin/users";
     }
