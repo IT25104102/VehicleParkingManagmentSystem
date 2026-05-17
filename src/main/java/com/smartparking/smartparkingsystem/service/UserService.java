@@ -40,8 +40,8 @@ public class UserService {
         List<User> list = new ArrayList<>();
         for (String line : FileUtil.readAll(FILE)) {
             if (line.trim().isEmpty()) continue;
-            User u = new User();
-            u.fromFileString(line);
+            User u = User.fromFileString(line);
+            if (u == null) continue;
             list.add(u);
         }
         return list;
@@ -50,7 +50,7 @@ public class UserService {
     // READ — Find by email
     public User findByEmail(String email) {
         for (User u : getAllUsers()) {
-            if (u.getEmail().equalsIgnoreCase(email))
+            if (u.getEmail() != null && u.getEmail().equalsIgnoreCase(email))
                 return u;
         }
         return null;
@@ -59,7 +59,7 @@ public class UserService {
     // READ — Find by ID
     public User findById(String id) {
         for (User u : getAllUsers()) {
-            if (u.getId().equals(id)) return u;
+            if (u.getId() != null && u.getId().equals(id)) return u;
         }
         return null;
     }
@@ -67,7 +67,7 @@ public class UserService {
     // READ — Get user by ID — returns Optional
     public Optional<User> getUserById(String id) {
         return getAllUsers().stream()
-                .filter(u -> u.getId().equals(id))
+                .filter(u -> u.getId() != null && u.getId().equals(id))
                 .findFirst();
     }
 
@@ -79,8 +79,8 @@ public class UserService {
         boolean found = false;
         for (String line : lines) {
             if (line.trim().isEmpty()) continue;
-            User u = new User();
-            u.fromFileString(line);
+            User u = User.fromFileString(line);
+            if (u == null) continue;
             if (u.getId().equals(userId)) {
                 if (!u.getPassword().equals(oldPassword))
                     return "wrong_password";
@@ -103,8 +103,8 @@ public class UserService {
         boolean found = false;
         for (String line : lines) {
             if (line.trim().isEmpty()) continue;
-            User u = new User();
-            u.fromFileString(line);
+            User u = User.fromFileString(line);
+            if (u == null) continue;
             if (u.getId().equals(userId)) {
                 u.setPhone(newPhone);
                 updated.add(u.toFileString());
@@ -124,8 +124,8 @@ public class UserService {
         boolean found = false;
         for (String line : lines) {
             if (line.trim().isEmpty()) continue;
-            User u = new User();
-            u.fromFileString(line);
+            User u = User.fromFileString(line);
+            if (u == null) continue;
             if (!u.getId().equals(userId)) {
                 updated.add(line);
             } else {
