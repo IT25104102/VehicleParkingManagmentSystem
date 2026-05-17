@@ -72,6 +72,14 @@ public class UserServlet {
                                  @RequestParam String password,
                                  @RequestParam String phone,
                                  RedirectAttributes ra) {
+
+        // Block admin domain from registering
+        if (email != null && email.toLowerCase().endsWith("@parkcity.lk")) {
+            ra.addFlashAttribute("error",
+                    "This email domain is not allowed for public registration.");
+            return "redirect:/register";
+        }
+
         String result = userService.registerUser(
                 name, email, password, phone);
         switch (result) {
@@ -205,7 +213,8 @@ public class UserServlet {
         if (!"ADMIN".equals(admin.getRole())) return "redirect:/home";
 
         if (userId.equals(admin.getId())) {
-            ra.addFlashAttribute("error", "You cannot delete your own admin account.");
+            ra.addFlashAttribute("error",
+                    "You cannot delete your own admin account.");
             return "redirect:/admin/users";
         }
 
