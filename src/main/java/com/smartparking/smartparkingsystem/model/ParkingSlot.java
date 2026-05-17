@@ -3,11 +3,6 @@ package com.smartparking.smartparkingsystem.model;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * ParkingSlot Model
- * Developer: Naveed M.I.M | IT25101466
- * Module: Parking Slot Management
- */
 public class ParkingSlot {
 
     public enum Status {
@@ -23,51 +18,46 @@ public class ParkingSlot {
     private Status status;
     private SlotType slotType;
     private String createdAt;
-
-    // ── Constructors ──────────────────────────────────────────────────────────
+    private String date; // NEW — date field e.g. 2026-05-17
 
     public ParkingSlot() {}
 
     public ParkingSlot(String id, String slotNumber, Status status,
-                       SlotType slotType, String createdAt) {
+                       SlotType slotType, String createdAt, String date) {
         this.id         = id;
         this.slotNumber = slotNumber;
         this.status     = status;
         this.slotType   = slotType;
         this.createdAt  = createdAt;
+        this.date       = date;
     }
 
-    /** Convenience constructor — stamps createdAt automatically. */
     public ParkingSlot(String id, String slotNumber, Status status, SlotType slotType) {
         this(id, slotNumber, status, slotType,
-             LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+             LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+             LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
     }
 
-    // ── Getters & Setters ─────────────────────────────────────────────────────
-
+    // Getters & Setters
     public String getId()                   { return id; }
     public void   setId(String id)          { this.id = id; }
-
-    public String getSlotNumber()                    { return slotNumber; }
-    public void   setSlotNumber(String slotNumber)   { this.slotNumber = slotNumber; }
-
+    public String getSlotNumber()           { return slotNumber; }
+    public void   setSlotNumber(String s)   { this.slotNumber = s; }
     public Status getStatus()               { return status; }
-    public void   setStatus(Status status)  { this.status = status; }
+    public void   setStatus(Status s)       { this.status = s; }
+    public SlotType getSlotType()           { return slotType; }
+    public void   setSlotType(SlotType t)   { this.slotType = t; }
+    public String getCreatedAt()            { return createdAt; }
+    public void   setCreatedAt(String c)    { this.createdAt = c; }
+    public String getDate()                 { return date; }
+    public void   setDate(String date)      { this.date = date; }
 
-    public SlotType getSlotType()                  { return slotType; }
-    public void     setSlotType(SlotType slotType) { this.slotType = slotType; }
-
-    public String getCreatedAt()                   { return createdAt; }
-    public void   setCreatedAt(String createdAt)   { this.createdAt = createdAt; }
-
-    // ── File serialisation helpers ────────────────────────────────────────────
-
-    /** Pipe-delimited line written to slots.txt */
+    // File format: id|slotNumber|status|slotType|createdAt|date
     public String toFileString() {
-        return String.join("|", id, slotNumber, status.name(), slotType.name(), createdAt);
+        return String.join("|", id, slotNumber, status.name(),
+                slotType.name(), createdAt, date != null ? date : "");
     }
 
-    /** Parse one line from slots.txt back into a ParkingSlot. */
     public static ParkingSlot fromFileString(String line) {
         String[] p = line.split("\\|");
         if (p.length < 5) return null;
@@ -77,27 +67,16 @@ public class ParkingSlot {
         s.setStatus(Status.valueOf(p[2]));
         s.setSlotType(SlotType.valueOf(p[3]));
         s.setCreatedAt(p[4]);
+        s.setDate(p.length > 5 ? p[5] : "");
         return s;
     }
 
-    // ── Display helpers (used in JSP EL) ─────────────────────────────────────
-
-    /** CSS colour class used in the slot map. */
     public String getStatusColor() {
         return switch (status) {
-            case AVAILABLE    -> "#37ff8b";   // neon green
-            case OCCUPIED     -> "#ff4c4c";   // red
-            case PENDING      -> "#ffd700";   // yellow
-            case PRE_RESERVED -> "#a0522d";   // brown
-        };
-    }
-
-    public String getStatusLabel() {
-        return switch (status) {
-            case AVAILABLE    -> "Available";
-            case OCCUPIED     -> "Occupied";
-            case PENDING      -> "Pending";
-            case PRE_RESERVED -> "Pre-Reserved";
+            case AVAILABLE    -> "#37ff8b";
+            case OCCUPIED     -> "#ff4c4c";
+            case PENDING      -> "#ffd700";
+            case PRE_RESERVED -> "#a0522d";
         };
     }
 
@@ -115,6 +94,6 @@ public class ParkingSlot {
     public String toString() {
         return "ParkingSlot{id='" + id + "', slotNumber='" + slotNumber +
                "', status=" + status + ", slotType=" + slotType +
-               ", createdAt='" + createdAt + "'}";
+               ", date='" + date + "'}";
     }
 }
