@@ -1,4 +1,4 @@
- package com.smartparking.smartparkingsystem.service;
+package com.smartparking.smartparkingsystem.service;
 
 import com.smartparking.smartparkingsystem.model.ParkingSlot;
 import com.smartparking.smartparkingsystem.util.FileUtil;
@@ -11,24 +11,19 @@ public class ParkingSlotService {
     private static final String FILE = "data/slots.txt";
 
     // CREATE — Add new slot
-    public boolean addSlot(String slotNumber,
-            String slotType) {
-        if (slotNumber == null || slotNumber.isEmpty())
-            return false;
+    public boolean addSlot(String slotNumber, String slotType) {
+        if (slotNumber == null || slotNumber.isEmpty()) return false;
         try {
             ParkingSlot slot = new ParkingSlot();
             slot.setId(FileUtil.generateId("SLT"));
-            slot.setSlotNumber(
-                slotNumber.toUpperCase().trim());
+            slot.setSlotNumber(slotNumber.toUpperCase().trim());
             slot.setStatus(ParkingSlot.Status.AVAILABLE);
-            slot.setSlotType(ParkingSlot.SlotType.valueOf(
-                slotType.toUpperCase()));
+            slot.setSlotType(ParkingSlot.SlotType.valueOf(slotType.toUpperCase()));
             slot.setCreatedAt(new Date().toString());
             FileUtil.appendLine(FILE, slot.toFileString());
             return true;
         } catch (Exception e) {
-            System.err.println("Error adding slot: "
-                + e.getMessage());
+            System.err.println("Error adding slot: " + e.getMessage());
             return false;
         }
     }
@@ -39,12 +34,11 @@ public class ParkingSlotService {
         for (String line : FileUtil.readAll(FILE)) {
             if (line.trim().isEmpty()) continue;
             try {
-                ParkingSlot slot = new ParkingSlot();
-                slot.fromFileString(line);
+                ParkingSlot slot = ParkingSlot.fromFileString(line);
+                if (slot == null) continue;
                 list.add(slot);
             } catch (Exception e) {
-                System.err.println("Error reading slot: "
-                    + e.getMessage());
+                System.err.println("Error reading slot: " + e.getMessage());
             }
         }
         return list;
@@ -53,7 +47,7 @@ public class ParkingSlotService {
     // READ — Find by ID
     public ParkingSlot findById(String id) {
         for (ParkingSlot slot : getAllSlots()) {
-            if (slot.getId().equals(id)) return slot;
+            if (slot.getId() != null && slot.getId().equals(id)) return slot;
         }
         return null;
     }
@@ -75,12 +69,11 @@ public class ParkingSlotService {
         for (String line : lines) {
             if (line.trim().isEmpty()) continue;
             try {
-                ParkingSlot slot = new ParkingSlot();
-                slot.fromFileString(line);
+                ParkingSlot slot = ParkingSlot.fromFileString(line);
+                if (slot == null) continue;
                 if (slot.getId().equals(id)) {
                     ParkingSlot.Status next =
-                        slot.getStatus() ==
-                        ParkingSlot.Status.AVAILABLE
+                        slot.getStatus() == ParkingSlot.Status.AVAILABLE
                         ? ParkingSlot.Status.OCCUPIED
                         : ParkingSlot.Status.AVAILABLE;
                     slot.setStatus(next);
@@ -105,8 +98,8 @@ public class ParkingSlotService {
         for (String line : lines) {
             if (line.trim().isEmpty()) continue;
             try {
-                ParkingSlot slot = new ParkingSlot();
-                slot.fromFileString(line);
+                ParkingSlot slot = ParkingSlot.fromFileString(line);
+                if (slot == null) continue;
                 if (!slot.getId().equals(id)) {
                     updated.add(line);
                 } else {
