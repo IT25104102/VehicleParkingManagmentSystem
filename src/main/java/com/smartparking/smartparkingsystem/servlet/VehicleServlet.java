@@ -27,17 +27,17 @@ public class VehicleServlet {
     // READ — Show all vehicles
     @GetMapping("/list")
     public String list(Model model) {
-        model.addAttribute("vehicles",
-            vehicleService.getAllVehicles());
+        model.addAttribute("vehicles", vehicleService.getAllVehicles());
         return "Vehicle/vehicle-list";
     }
 
-    // NEW — Vehicle selection page (after clicking slot)
+    // NEW — Vehicle selection page
     @GetMapping("/select")
     public String selectVehicle(
             @RequestParam String slotId,
             @RequestParam String slotNumber,
             @RequestParam String slotType,
+            @RequestParam(required = false) String date,
             HttpSession session,
             Model model) {
         List<Vehicle> vehicles = vehicleService.getAllVehicles();
@@ -45,6 +45,7 @@ public class VehicleServlet {
         model.addAttribute("slotId", slotId);
         model.addAttribute("slotNumber", slotNumber);
         model.addAttribute("slotType", slotType);
+        model.addAttribute("date", date);
         return "Vehicle/vehicle-select";
     }
 
@@ -54,10 +55,12 @@ public class VehicleServlet {
             @RequestParam(required = false) String slotId,
             @RequestParam(required = false) String slotNumber,
             @RequestParam(required = false) String slotType,
+            @RequestParam(required = false) String date,
             Model model) {
         model.addAttribute("slotId", slotId);
         model.addAttribute("slotNumber", slotNumber);
         model.addAttribute("slotType", slotType);
+        model.addAttribute("date", date);
         return "Vehicle/add-vehicle";
     }
 
@@ -71,6 +74,7 @@ public class VehicleServlet {
             @RequestParam(required = false) String slotId,
             @RequestParam(required = false) String slotNumber,
             @RequestParam(required = false) String slotType,
+            @RequestParam(required = false) String date,
             @RequestParam String userId) {
 
         Vehicle v = new Vehicle();
@@ -80,31 +84,26 @@ public class VehicleServlet {
         v.setContactNumber(contactNumber);
         v.setStatus("Authorized");
         v.setUserId(userId);
-
-        // Add vehicle first — this sets the ID
         vehicleService.addVehicle(v);
 
-        // Get ID after it's been set
         String vehicleId = v.getVehicleId();
 
-        // If came from slot selection → go to tickets
         if (slotId != null && !slotId.isEmpty()) {
             return "redirect:/tickets/new"
                 + "?vehicleId=" + vehicleId
                 + "&slotId=" + slotId
                 + "&slotNumber=" + slotNumber
-                + "&vehicleNumber=" + licensePlate;
+                + "&vehicleNumber=" + licensePlate
+                + "&ownerName=" + ownerName
+                + "&date=" + (date != null ? date : "");
         }
-
         return "redirect:/vehicle/list";
     }
 
     // UPDATE — Show update form
     @GetMapping("/update")
-    public String showUpdate(@RequestParam String id,
-                             Model model) {
-        model.addAttribute("vehicle",
-            vehicleService.findById(id));
+    public String showUpdate(@RequestParam String id, Model model) {
+        model.addAttribute("vehicle", vehicleService.findById(id));
         return "Vehicle/edit-vehicle";
     }
 
@@ -114,8 +113,7 @@ public class VehicleServlet {
                          @RequestParam String licensePlate,
                          @RequestParam String ownerName,
                          @RequestParam String vehicleType) {
-        vehicleService.updateVehicle(id,
-            licensePlate, ownerName, vehicleType);
+        vehicleService.updateVehicle(id, licensePlate, ownerName, vehicleType);
         return "redirect:/vehicle/list";
     }
 
@@ -128,10 +126,8 @@ public class VehicleServlet {
 
     // READ — Search vehicle
     @GetMapping("/search")
-    public String search(@RequestParam String query,
-                         Model model) {
-        model.addAttribute("vehicles",
-            vehicleService.searchVehicle(query));
+    public String search(@RequestParam String query, Model model) {
+        model.addAttribute("vehicles", vehicleService.searchVehicle(query));
         return "Vehicle/vehicle-list";
     }
 }
