@@ -70,18 +70,15 @@
         .map-legend { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
         .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--text-dim); }
         .legend-dot  { width: 10px; height: 10px; border-radius: 50%; border: 2px solid; }
-
-        /* Date selector */
-        .date-selector { margin-bottom: 1.5rem; }
         .date-btn {
-            padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15);
+            padding: 8px 16px; border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
             background: transparent; color: var(--text-dim);
             font-family: 'Montserrat',sans-serif; font-size: 0.78rem;
             font-weight: 700; cursor: pointer; transition: 0.2s; margin: 4px;
         }
         .date-btn:hover { border-color: var(--btn-neon); color: var(--btn-neon); }
         .date-btn.active { background: var(--btn-neon); color: #0a1128; border-color: var(--btn-neon); }
-
         @media(max-width: 900px) {
             .zone-row.cars, .zone-row.vans-vip, .zone-row.threewheelers, .zone-row.bikes { grid-template-columns: repeat(5, 1fr); }
             .stats-grid { grid-template-columns: repeat(2,1fr); }
@@ -124,7 +121,7 @@
     </div>
 
     <%-- Date Selector --%>
-    <div class="date-selector">
+    <div style="margin-bottom:1.5rem;">
         <form method="get" action="${pageContext.request.contextPath}/slots"
               style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
             <c:forEach var="d" items="${availableDates}">
@@ -213,7 +210,7 @@
                 <c:if test="${slot.slotType == 'CAR' and slot.slotNumber ge 'C01' and slot.slotNumber le 'C10'}">
                     <c:choose>
                         <c:when test="${slot.status == 'AVAILABLE'}">
-                            <a href="${pageContext.request.contextPath}/vehicle/select?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}"
+                            <a href="${pageContext.request.contextPath}/vehicle/select?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}&date=${selectedDate}"
                                class="slot-cell slot-car available">
                                 <div class="slot-status-dot"></div>
                                 <div class="slot-icon">🚗</div>
@@ -242,7 +239,7 @@
                 <c:if test="${slot.slotType == 'CAR' and slot.slotNumber ge 'C11' and slot.slotNumber le 'C20'}">
                     <c:choose>
                         <c:when test="${slot.status == 'AVAILABLE'}">
-                            <a href="${pageContext.request.contextPath}/vehicle/select?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}"
+                            <a href="${pageContext.request.contextPath}/vehicle/select?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}&date=${selectedDate}"
                                class="slot-cell slot-car available">
                                 <div class="slot-status-dot"></div>
                                 <div class="slot-icon">🚗</div>
@@ -271,7 +268,7 @@
                 <c:if test="${slot.slotType == 'VAN'}">
                     <c:choose>
                         <c:when test="${slot.status == 'AVAILABLE'}">
-                            <a href="${pageContext.request.contextPath}/vehicle/select?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}"
+                            <a href="${pageContext.request.contextPath}/vehicle/select?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}&date=${selectedDate}"
                                class="slot-cell slot-van available">
                                 <div class="slot-status-dot"></div>
                                 <div class="slot-icon">🚐</div>
@@ -296,7 +293,7 @@
                 <c:if test="${slot.slotType == 'VIP'}">
                     <c:choose>
                         <c:when test="${slot.status == 'AVAILABLE'}">
-                            <a href="${pageContext.request.contextPath}/vehicle/select?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}"
+                            <a href="${pageContext.request.contextPath}/vehicle/select?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}&date=${selectedDate}"
                                class="slot-cell slot-vip available">
                                 <div class="slot-status-dot"></div>
                                 <div class="slot-icon">⭐</div>
@@ -325,7 +322,7 @@
                 <c:if test="${slot.slotType == 'THREE_WHEELER'}">
                     <c:choose>
                         <c:when test="${slot.status == 'AVAILABLE'}">
-                            <a href="${pageContext.request.contextPath}/vehicle/select?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}"
+                            <a href="${pageContext.request.contextPath}/vehicle/select?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}&date=${selectedDate}"
                                class="slot-cell slot-three available">
                                 <div class="slot-status-dot"></div>
                                 <div class="slot-icon">🛺</div>
@@ -354,7 +351,7 @@
                 <c:if test="${slot.slotType == 'BIKE'}">
                     <c:choose>
                         <c:when test="${slot.status == 'AVAILABLE'}">
-                            <a href="${pageContext.request.contextPath}/vehicle/select?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}"
+                            <a href="${pageContext.request.contextPath}/vehicle/select?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}&date=${selectedDate}"
                                class="slot-cell slot-bike available">
                                 <div class="slot-status-dot"></div>
                                 <div class="slot-icon">🏍</div>
