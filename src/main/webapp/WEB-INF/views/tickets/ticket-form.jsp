@@ -22,8 +22,7 @@
         .form-group.full { grid-column: 1 / -1; }
         label { color: var(--cyan); font-size: .7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
         input, select {
-            padding: 12px 16px;
-            background: rgba(255,255,255,0.04);
+            padding: 12px 16px; background: rgba(255,255,255,0.04);
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 8px; color: var(--text-main);
             font-family: Montserrat,sans-serif; font-size: .88rem;
@@ -39,33 +38,22 @@
             border: 1px solid rgba(255,255,255,0.06);
             border-radius: 12px; padding: 1.2rem; margin-bottom: 1.5rem;
         }
-        .price-chart-title {
-            font-size: 0.7rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.1em;
-            color: var(--text-dim); margin-bottom: 1rem;
-        }
+        .price-chart-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 1rem; }
         .price-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-        .price-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 8px; padding: 0.8rem; text-align: center;
-        }
+        .price-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 0.8rem; text-align: center; }
         .price-type { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 4px; }
         .price-amount { font-size: 1rem; font-weight: 800; color: var(--btn-neon); }
         .total-box {
-            background: rgba(55,255,139,0.05);
-            border: 1px solid rgba(55,255,139,0.2);
-            border-radius: 12px; padding: 1.2rem;
-            text-align: center; margin: 1.5rem 0;
+            background: rgba(55,255,139,0.05); border: 1px solid rgba(55,255,139,0.2);
+            border-radius: 12px; padding: 1.2rem; text-align: center; margin: 1.5rem 0;
         }
         .total-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
         .total-amount { font-size: 2rem; font-weight: 800; color: var(--btn-neon); }
         .btn-generate {
-            width: 100%; padding: 14px;
-            background: var(--btn-neon); color: #0c1a12;
+            width: 100%; padding: 14px; background: var(--btn-neon); color: #0c1a12;
             border: 2px solid var(--btn-neon); border-radius: 20px;
-            font-family: Montserrat,sans-serif; font-weight: 800;
-            font-size: .95rem; cursor: pointer; transition: 0.3s;
+            font-family: Montserrat,sans-serif; font-weight: 800; font-size: .95rem;
+            cursor: pointer; transition: 0.3s;
         }
         .btn-generate:hover { transform: translateY(-3px); box-shadow: 0 0 20px var(--btn-neon); }
         .back-link { display: block; text-align: center; margin-top: 18px; color: var(--text-dim); font-size: .8rem; }
@@ -100,7 +88,7 @@
 <div class="page-wrap">
     <div class="form-card">
         <h2>&#127915; Generate Parking Ticket</h2>
-        <p>Vehicle and slot details are pre-filled — just select duration to generate your ticket</p>
+        <p>Vehicle and slot details are pre-filled — just select duration</p>
 
         <!-- Price Chart -->
         <div class="price-chart">
@@ -131,13 +119,13 @@
 
         <form action="${pageContext.request.contextPath}/tickets/create" method="post">
 
-            <%-- Hidden fields — pass all info through --%>
-            <input type="hidden" name="ownerName"     value="${param.ownerName}"/>
-            <input type="hidden" name="slotId"        value="${param.slotId}"/>
-            <input type="hidden" name="slotNumber"    value="${param.slotNumber}"/>
+            <%-- Hidden fields --%>
+            <input type="hidden" name="ownerName"  value="${param.ownerName}"/>
+            <input type="hidden" name="slotId"     value="${param.slotId}"/>
+            <input type="hidden" name="slotNumber" value="${param.slotNumber}"/>
+            <input type="hidden" name="date"       value="${param.date}"/>
 
             <div class="form-grid">
-
                 <div class="form-group">
                     <label>Vehicle ID</label>
                     <input type="text" name="vehicleId"
@@ -150,15 +138,16 @@
                 </div>
                 <div class="form-group">
                     <label>Owner Name</label>
-                    <input type="text"
-                           value="${param.ownerName}" readonly/>
+                    <input type="text" value="${param.ownerName}" readonly/>
                 </div>
                 <div class="form-group">
                     <label>Parking Slot</label>
-                    <input type="text"
-                           value="${param.slotNumber}" readonly/>
+                    <input type="text" value="${param.slotNumber}" readonly/>
                 </div>
-
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="text" value="${param.date}" readonly/>
+                </div>
                 <div class="form-group full">
                     <label>Vehicle Type</label>
                     <select name="vehicleType" id="vehicleType"
@@ -171,14 +160,12 @@
                         <option value="VIP">VIP Vehicle — Rs.800/hr</option>
                     </select>
                 </div>
-
                 <div class="form-group full">
                     <label>Duration (Hours)</label>
                     <input type="number" name="hours" id="hours"
                            placeholder="e.g. 3" min="1" max="24"
                            oninput="calculateTotal()" required/>
                 </div>
-
             </div>
 
             <!-- Total Amount -->
@@ -219,22 +206,16 @@
 
 <script>
     const rates = {
-        'Bike': 200,
-        'Three-Wheeler': 250,
-        'Car': 350,
-        'Van': 550,
-        'VIP': 800
+        'Bike': 200, 'Three-Wheeler': 250,
+        'Car': 350, 'Van': 550, 'VIP': 800
     };
-
     function calculateTotal() {
-        const type = document.getElementById('vehicleType').value;
+        const type  = document.getElementById('vehicleType').value;
         const hours = parseFloat(document.getElementById('hours').value) || 0;
-        const rate = rates[type] || 0;
-        const total = rate * hours;
+        const total = (rates[type] || 0) * hours;
         document.getElementById('totalDisplay').textContent = 'Rs. ' + total.toFixed(2);
         document.getElementById('totalAmount').value = total.toFixed(2);
     }
 </script>
-
 </body>
 </html>
