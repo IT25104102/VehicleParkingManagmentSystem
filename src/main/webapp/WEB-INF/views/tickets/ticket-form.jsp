@@ -1,64 +1,85 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ParkCity | Generate Ticket</title>
+    <title>MyParking | Generate Ticket</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-        :root { --text-main:#f0f6fc; --text-dim:#b8c7e0; --btn-neon:#37ff8b; --cyan:#1ad9f0; --orange:#f0a500; --red:#ff4d6d; }
-        * { box-sizing:border-box; margin:0; padding:0; }
-        body { font-family:Montserrat,sans-serif; color:var(--text-main);
-               background:radial-gradient(at top left,#1e3a8a 0%,#0a1128 50%),radial-gradient(at bottom right,#0d1117 0%,#010409 60%);
-               background-attachment:fixed; min-height:100vh; }
-        a { text-decoration:none; color:inherit; transition:0.3s; }
+        .page-wrap { padding: 60px 5%; display: flex; justify-content: center; }
+        .form-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(26,217,240,0.2);
+            border-radius: 14px; padding: 40px; width: 600px;
+            animation: blurClear .6s ease both;
+        }
+        .form-card h2 { color: white; font-size: 1.4rem; margin-bottom: 8px; }
+        .form-card p  { color: var(--text-dim); font-size: .82rem; margin-bottom: 30px; }
 
-        /* Header */
-        .main-header { width:100%; z-index:1000; position:sticky; top:0; }
-        .top-bar { display:flex; justify-content:space-between; align-items:center; padding:15px 5%; background:rgba(10,17,40,0.8); backdrop-filter:blur(10px); }
-        .logo { font-weight:800; font-size:1.15rem; }
-        .logo-icon { color:var(--cyan); margin-right:6px; }
-        .header-controls { display:flex; gap:10px; }
-        .btn-sm { padding:5px 18px; font-size:0.7rem; font-weight:700; border-radius:15px; background:transparent; border:1px solid var(--btn-neon); color:var(--btn-neon); cursor:pointer; font-family:Montserrat,sans-serif; transition:0.3s; }
-        .btn-sm.login:hover { background:var(--btn-neon); color:#0c1a12; }
-        .full-width-nav { width:100%; background:#0d1117; border-bottom:2px solid var(--cyan); box-shadow:0 4px 15px rgba(0,0,0,0.3); }
-        .full-width-nav ul { display:flex; justify-content:center; list-style:none; padding:12px 0; }
-        .full-width-nav li a { text-transform:uppercase; font-size:0.8rem; font-weight:600; padding:0 20px; }
-        .full-width-nav li a:hover, .full-width-nav li a.active { color:var(--btn-neon); text-shadow:0 0 10px var(--btn-neon); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group.full { grid-column: 1 / -1; }
 
-        /* Page */
-        .page-wrap { padding:60px 5%; display:flex; justify-content:center; }
+        label { color: var(--cyan); font-size: .7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        input, select {
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px; color: var(--text-main);
+            font-family: Montserrat,sans-serif; font-size: .88rem;
+            outline: none; transition: 0.3s; width: 100%;
+        }
+        input:focus, select:focus { border-color: var(--cyan); box-shadow: 0 0 12px rgba(26,217,240,0.2); }
+        input::placeholder { color: #2a3a55; }
+        input[readonly] { opacity: 0.7; cursor: not-allowed; border-color: rgba(26,217,240,0.15); }
+        select option { background: #0a1128; color: white; }
 
-        /* Card */
-        .form-card { background:rgba(255,255,255,0.03); border:1px solid rgba(26,217,240,0.2); border-radius:14px; padding:40px; width:540px; transition:0.3s; animation:blurClear .6s ease both; }
-        .form-card:hover { background:rgba(255,255,255,0.05); border-color:rgba(26,217,240,0.4); box-shadow:0 10px 30px rgba(0,0,0,0.3); }
-        .form-card h2 { color:white; font-size:1.4rem; margin-bottom:8px; }
-        .form-card p  { color:var(--text-dim); font-size:.82rem; margin-bottom:30px; }
+        .form-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 26px 0; }
 
-        .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-        .form-group { display:flex; flex-direction:column; gap:8px; }
-        .form-group.full { grid-column:1 / -1; }
+        /* Price chart */
+        .price-chart {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px; padding: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .price-chart-title {
+            font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            color: var(--text-dim); margin-bottom: 1rem;
+        }
+        .price-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+        .price-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px; padding: 0.8rem;
+            text-align: center;
+        }
+        .price-type { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 4px; }
+        .price-amount { font-size: 1rem; font-weight: 800; color: var(--btn-neon); }
 
-        label { color:var(--cyan); font-size:.7rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
-        input { padding:12px 16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:var(--text-main); font-family:Montserrat,sans-serif; font-size:.88rem; outline:none; transition:0.3s; }
-        input:focus { border-color:var(--cyan); box-shadow:0 0 12px rgba(26,217,240,0.2); }
-        input::placeholder { color:#2a3a55; }
+        /* Total amount */
+        .total-box {
+            background: rgba(55,255,139,0.05);
+            border: 1px solid rgba(55,255,139,0.2);
+            border-radius: 12px; padding: 1.2rem;
+            text-align: center; margin: 1.5rem 0;
+        }
+        .total-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+        .total-amount { font-size: 2rem; font-weight: 800; color: var(--btn-neon); }
 
-        .form-divider { border:none; border-top:1px solid rgba(255,255,255,0.07); margin:26px 0; }
-
-        .btn-generate { width:100%; padding:14px; background:var(--btn-neon); color:#0c1a12; border:2px solid var(--btn-neon); border-radius:20px; font-family:Montserrat,sans-serif; font-weight:800; font-size:.95rem; cursor:pointer; letter-spacing:.5px; transition:0.3s; }
-        .btn-generate:hover { transform:translateY(-3px); box-shadow:0 0 20px var(--btn-neon); }
-
-        .back-link { display:block; text-align:center; margin-top:18px; color:var(--text-dim); font-size:.8rem; }
-        .back-link:hover { color:var(--cyan); }
-
-        /* Footer */
-        footer { background:rgba(13,17,23,0.8); padding:40px 5%; border-top:1px solid rgba(255,255,255,0.05); margin-top:60px; }
-        .footer-grid { display:flex; justify-content:center; gap:40px; }
-        .f-col { display:flex; flex-direction:column; font-size:0.8rem; }
-        .f-col a { color:var(--text-dim); padding-bottom:5px; }
-        .f-col a:hover { color:var(--btn-neon); }
-        .contact-info { color:var(--text-dim); }
+        .btn-generate {
+            width: 100%; padding: 14px;
+            background: var(--btn-neon); color: #0c1a12;
+            border: 2px solid var(--btn-neon); border-radius: 20px;
+            font-family: Montserrat,sans-serif; font-weight: 800;
+            font-size: .95rem; cursor: pointer; transition: 0.3s;
+        }
+        .btn-generate:hover { transform: translateY(-3px); box-shadow: 0 0 20px var(--btn-neon); }
+        .back-link { display: block; text-align: center; margin-top: 18px; color: var(--text-dim); font-size: .8rem; }
+        .back-link:hover { color: var(--cyan); }
 
         @keyframes blurClear { from { filter:blur(8px); opacity:0; transform:translateY(10px); } to { filter:blur(0); opacity:1; transform:translateY(0); } }
     </style>
@@ -67,19 +88,23 @@
 
 <header class="main-header">
     <div class="top-bar">
-        <div class="logo"><span class="logo-icon">&#10018;</span> ParkCity</div>
+        <div class="logo"><span class="logo-icon">&#10018;</span> MyParking</div>
         <div class="header-controls">
-            <button class="btn-sm">Sign up</button>
-            <button class="btn-sm login">Log in</button>
+            <a href="${pageContext.request.contextPath}/profile">
+                <button class="btn-sm">${sessionScope.loggedInUser.name}</button>
+            </a>
+            <a href="${pageContext.request.contextPath}/logout">
+                <button class="btn-sm login">Log out</button>
+            </a>
         </div>
     </div>
     <nav class="full-width-nav">
         <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Parking Slots</a></li>
-            <li><a href="#">My Vehicles</a></li>
-            <li><a href="/tickets" class="active">Tickets</a></li>
-            <li><a href="#">Payments</a></li>
+            <li><a href="${pageContext.request.contextPath}/home">Home</a></li>
+            <li><a href="${pageContext.request.contextPath}/slots">Parking Slots</a></li>
+            <li><a href="${pageContext.request.contextPath}/vehicle/list">My Vehicles</a></li>
+            <li><a href="${pageContext.request.contextPath}/tickets" class="active">Tickets</a></li>
+            <li><a href="${pageContext.request.contextPath}/payment/history">Payments</a></li>
         </ul>
     </nav>
 </header>
@@ -87,52 +112,143 @@
 <div class="page-wrap">
     <div class="form-card">
         <h2>&#127915; Generate Parking Ticket</h2>
-        <p>Fill in the vehicle and slot details to issue a digital ticket</p>
+        <p>Vehicle and slot details are pre-filled — just select duration to generate your ticket</p>
 
-        <form action="/tickets/create" method="post">
+        <!-- Price Chart -->
+        <div class="price-chart">
+            <div class="price-chart-title">Rate Chart</div>
+            <div class="price-grid">
+                <div class="price-item">
+                    <div class="price-type">Bike</div>
+                    <div class="price-amount">Rs.200/hr</div>
+                </div>
+                <div class="price-item">
+                    <div class="price-type">Three Wheeler</div>
+                    <div class="price-amount">Rs.250/hr</div>
+                </div>
+                <div class="price-item">
+                    <div class="price-type">Car</div>
+                    <div class="price-amount">Rs.350/hr</div>
+                </div>
+                <div class="price-item">
+                    <div class="price-type">Van</div>
+                    <div class="price-amount">Rs.550/hr</div>
+                </div>
+                <div class="price-item">
+                    <div class="price-type">VIP Vehicle</div>
+                    <div class="price-amount">Rs.800/hr</div>
+                </div>
+            </div>
+        </div>
+
+        <form action="${pageContext.request.contextPath}/tickets/create" method="post">
+
             <div class="form-grid">
+
+                <!-- Auto-filled fields -->
                 <div class="form-group">
                     <label>Vehicle ID</label>
-                    <input type="text" name="vehicleId" placeholder="e.g. V001" required/>
+                    <input type="text" name="vehicleId"
+                           value="${param.vehicleId}"
+                           readonly/>
                 </div>
                 <div class="form-group">
                     <label>Vehicle Number</label>
-                    <input type="text" name="vehicleNumber" placeholder="e.g. ABC-1234" required/>
+                    <input type="text" name="vehicleNumber"
+                           value="${param.vehicleNumber}"
+                           readonly/>
                 </div>
+                <div class="form-group">
+                    <label>Parking Slot</label>
+                    <input type="text" name="slotNumber"
+                           value="${param.slotNumber}"
+                           readonly/>
+                </div>
+                <div class="form-group">
+                    <label>Slot ID</label>
+                    <input type="text" name="slotId"
+                           value="${param.slotId}"
+                           readonly/>
+                </div>
+
+                <!-- Vehicle type for price calculation -->
                 <div class="form-group full">
-                    <label>Parking Slot ID</label>
-                    <input type="text" name="slotId" placeholder="e.g. S-12A" required/>
+                    <label>Vehicle Type</label>
+                    <select name="vehicleType" id="vehicleType"
+                            onchange="calculateTotal()" required>
+                        <option value="">-- Select Vehicle Type --</option>
+                        <option value="Bike">Bike — Rs.200/hr</option>
+                        <option value="Three-Wheeler">Three Wheeler — Rs.250/hr</option>
+                        <option value="Car">Car — Rs.350/hr</option>
+                        <option value="Van">Van — Rs.550/hr</option>
+                        <option value="VIP">VIP Vehicle — Rs.800/hr</option>
+                    </select>
                 </div>
+
+                <!-- Duration -->
+                <div class="form-group full">
+                    <label>Duration (Hours)</label>
+                    <input type="number" name="hours" id="hours"
+                           placeholder="e.g. 3" min="1" max="24"
+                           oninput="calculateTotal()" required/>
+                </div>
+
             </div>
+
+            <!-- Total Amount -->
+            <div class="total-box">
+                <div class="total-label">Total Amount</div>
+                <div class="total-amount" id="totalDisplay">Rs. 0.00</div>
+                <input type="hidden" name="totalAmount" id="totalAmount" value="0"/>
+            </div>
+
             <hr class="form-divider">
             <button type="submit" class="btn-generate">&#127915; Generate Ticket</button>
         </form>
 
-        <a href="/tickets" class="back-link">&#8592; Back to Ticket List</a>
+        <a href="${pageContext.request.contextPath}/tickets" class="back-link">&#8592; Back to Ticket List</a>
     </div>
 </div>
 
-<footer>
+<footer class="layered-footer">
     <div class="footer-grid">
         <div class="f-col">
-            <a href="#">My Vehicles</a>
-            <a href="#">Parking Slots</a>
-            <a href="#">Tickets</a>
-            <a href="#">Payments</a>
+            <a href="${pageContext.request.contextPath}/vehicle/list">My Vehicles</a>
+            <a href="${pageContext.request.contextPath}/slots">Parking Slots</a>
+            <a href="${pageContext.request.contextPath}/tickets">Tickets</a>
+            <a href="${pageContext.request.contextPath}/payment/history">Payments</a>
         </div>
-        <div class="footer-grid">
-            <div class="f-col">
-                <a href="#">Home</a>
-                <a href="#">About</a>
-                <a href="#">Help</a>
-            </div>
-            <div class="f-col contact-info">
-                <strong>Contact us:</strong>
-                <p>ParkCity@gmail.com</p>
-                <p>0712345678</p>
-            </div>
+        <div class="f-col">
+            <a href="${pageContext.request.contextPath}/home">Home</a>
+            <a href="#">About</a>
+            <a href="#">Help</a>
+        </div>
+        <div class="f-col contact-info">
+            <strong>Contact us:</strong>
+            <p>MyParking@gmail.com</p>
+            <p>0712345678</p>
         </div>
     </div>
 </footer>
+
+<script>
+    const rates = {
+        'Bike': 200,
+        'Three-Wheeler': 250,
+        'Car': 350,
+        'Van': 550,
+        'VIP': 800
+    };
+
+    function calculateTotal() {
+        const type = document.getElementById('vehicleType').value;
+        const hours = parseFloat(document.getElementById('hours').value) || 0;
+        const rate = rates[type] || 0;
+        const total = rate * hours;
+        document.getElementById('totalDisplay').textContent = 'Rs. ' + total.toFixed(2);
+        document.getElementById('totalAmount').value = total.toFixed(2);
+    }
+</script>
+
 </body>
 </html>
