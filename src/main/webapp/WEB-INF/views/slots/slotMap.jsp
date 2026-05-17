@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -131,7 +131,7 @@
         }
 
         .stats-grid {
-            display: grid; grid-template-columns: repeat(5,1fr);
+            display: grid; grid-template-columns: repeat(4,1fr);
             gap: 1rem; margin-bottom: 1.5rem;
         }
         .stat-card {
@@ -141,7 +141,6 @@
         }
         .stat-number { font-size: 1.6rem; font-weight: 800; }
         .stat-label  { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
-        .stat-card.cyan   .stat-number { color: var(--cyan); }
         .stat-card.green  .stat-number { color: #37ff8b; }
         .stat-card.red    .stat-number { color: #ff4c4c; }
         .stat-card.yellow .stat-number { color: #ffd700; }
@@ -159,13 +158,12 @@
             .zone-row.vans-vip,
             .zone-row.threewheelers,
             .zone-row.bikes { grid-template-columns: repeat(5, 1fr); }
-            .stats-grid { grid-template-columns: repeat(3,1fr); }
+            .stats-grid { grid-template-columns: repeat(2,1fr); }
         }
     </style>
 </head>
 <body>
 
-<!-- Header -->
 <header class="main-header">
     <div class="top-bar">
         <div class="logo">
@@ -173,7 +171,7 @@
         </div>
         <div class="header-controls">
             <a href="${pageContext.request.contextPath}/profile">
-                <button class="btn-sm">${user.name}</button>
+                <button class="btn-sm">${sessionScope.loggedInUser.name}</button>
             </a>
             <a href="${pageContext.request.contextPath}/logout">
                 <button class="btn-sm login">Log out</button>
@@ -193,15 +191,14 @@
 
 <div class="page-container">
 
-    <div class="page-header" style="margin-bottom:1.5rem;">
+    <div style="margin-bottom:1.5rem;">
         <h1 class="page-title">🗺 Parking Slot Map</h1>
         <p class="page-subtitle">
             50 slots across 5 vehicle types — click any
-            <span style="color:#37ff8b;font-weight:700;">green</span> slot to check in
+            <span style="color:#37ff8b;font-weight:700;">green</span> slot to select your vehicle
         </p>
     </div>
 
-    <!-- Flash alerts -->
     <c:if test="${not empty successMsg}">
         <div class="alert alert-success">✅ ${successMsg}</div>
     </c:if>
@@ -210,30 +207,30 @@
     </c:if>
 
     <!-- Stats -->
-<div class="stats-grid" style="grid-template-columns: repeat(4,1fr);">
-    <div class="stat-card green">
-        <div class="stat-number">${available}</div>
-        <div class="stat-label">Available</div>
+    <div class="stats-grid">
+        <div class="stat-card green">
+            <div class="stat-number">${available}</div>
+            <div class="stat-label">Available</div>
+        </div>
+        <div class="stat-card red">
+            <div class="stat-number">${occupied}</div>
+            <div class="stat-label">Occupied</div>
+        </div>
+        <div class="stat-card yellow">
+            <div class="stat-number">${pending}</div>
+            <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-card brown">
+            <div class="stat-number">${preReserved}</div>
+            <div class="stat-label">Pre-Reserved</div>
+        </div>
     </div>
-    <div class="stat-card red">
-        <div class="stat-number">${occupied}</div>
-        <div class="stat-label">Occupied</div>
-    </div>
-    <div class="stat-card yellow">
-        <div class="stat-number">${pending}</div>
-        <div class="stat-label">Pending</div>
-    </div>
-    <div class="stat-card brown">
-        <div class="stat-number">${preReserved}</div>
-        <div class="stat-label">Pre-Reserved</div>
-    </div>
-</div>
 
     <!-- Legend -->
     <div class="map-legend">
         <div class="legend-item">
             <div class="legend-dot" style="background:#37ff8b;border-color:#37ff8b;"></div>
-            <span>Available — click to check in</span>
+            <span>Available — click to select vehicle</span>
         </div>
         <div class="legend-item">
             <div class="legend-dot" style="background:#ff4c4c;border-color:#ff4c4c;"></div>
@@ -264,12 +261,12 @@
                 <c:if test="${slot.slotType == 'CAR' and slot.slotNumber ge 'C01' and slot.slotNumber le 'C10'}">
                     <c:choose>
                         <c:when test="${slot.status == 'AVAILABLE'}">
-                            <a href="${pageContext.request.contextPath}/slots/checkin/${slot.id}"
+                            <a href="${pageContext.request.contextPath}/vehicle/list?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}"
                                class="slot-cell slot-car available">
                                 <div class="slot-status-dot"></div>
                                 <div class="slot-icon">🚗</div>
                                 <div class="slot-number">${slot.slotNumber}</div>
-                                <div class="checkin-hint">Check In</div>
+                                <div class="checkin-hint">Select</div>
                             </a>
                         </c:when>
                         <c:otherwise>
@@ -293,12 +290,12 @@
                 <c:if test="${slot.slotType == 'CAR' and slot.slotNumber ge 'C11' and slot.slotNumber le 'C20'}">
                     <c:choose>
                         <c:when test="${slot.status == 'AVAILABLE'}">
-                            <a href="${pageContext.request.contextPath}/slots/checkin/${slot.id}"
+                            <a href="${pageContext.request.contextPath}/vehicle/list?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}"
                                class="slot-cell slot-car available">
                                 <div class="slot-status-dot"></div>
                                 <div class="slot-icon">🚗</div>
                                 <div class="slot-number">${slot.slotNumber}</div>
-                                <div class="checkin-hint">Check In</div>
+                                <div class="checkin-hint">Select</div>
                             </a>
                         </c:when>
                         <c:otherwise>
@@ -322,12 +319,12 @@
                 <c:if test="${slot.slotType == 'VAN'}">
                     <c:choose>
                         <c:when test="${slot.status == 'AVAILABLE'}">
-                            <a href="${pageContext.request.contextPath}/slots/checkin/${slot.id}"
+                            <a href="${pageContext.request.contextPath}/vehicle/list?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}"
                                class="slot-cell slot-van available">
                                 <div class="slot-status-dot"></div>
                                 <div class="slot-icon">🚐</div>
                                 <div class="slot-number">${slot.slotNumber}</div>
-                                <div class="checkin-hint">Check In</div>
+                                <div class="checkin-hint">Select</div>
                             </a>
                         </c:when>
                         <c:otherwise>
@@ -347,12 +344,12 @@
                 <c:if test="${slot.slotType == 'VIP'}">
                     <c:choose>
                         <c:when test="${slot.status == 'AVAILABLE'}">
-                            <a href="${pageContext.request.contextPath}/slots/checkin/${slot.id}"
+                            <a href="${pageContext.request.contextPath}/vehicle/list?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}"
                                class="slot-cell slot-vip available">
                                 <div class="slot-status-dot"></div>
                                 <div class="slot-icon">⭐</div>
                                 <div class="slot-number">${slot.slotNumber}</div>
-                                <div class="checkin-hint">Check In</div>
+                                <div class="checkin-hint">Select</div>
                             </a>
                         </c:when>
                         <c:otherwise>
@@ -376,12 +373,12 @@
                 <c:if test="${slot.slotType == 'THREE_WHEELER'}">
                     <c:choose>
                         <c:when test="${slot.status == 'AVAILABLE'}">
-                            <a href="${pageContext.request.contextPath}/slots/checkin/${slot.id}"
+                            <a href="${pageContext.request.contextPath}/vehicle/list?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}"
                                class="slot-cell slot-three available">
                                 <div class="slot-status-dot"></div>
                                 <div class="slot-icon">🛺</div>
                                 <div class="slot-number">${slot.slotNumber}</div>
-                                <div class="checkin-hint">Check In</div>
+                                <div class="checkin-hint">Select</div>
                             </a>
                         </c:when>
                         <c:otherwise>
@@ -405,12 +402,12 @@
                 <c:if test="${slot.slotType == 'BIKE'}">
                     <c:choose>
                         <c:when test="${slot.status == 'AVAILABLE'}">
-                            <a href="${pageContext.request.contextPath}/slots/checkin/${slot.id}"
+                            <a href="${pageContext.request.contextPath}/vehicle/list?slotId=${slot.id}&slotNumber=${slot.slotNumber}&slotType=${slot.slotType}"
                                class="slot-cell slot-bike available">
                                 <div class="slot-status-dot"></div>
                                 <div class="slot-icon">🏍</div>
                                 <div class="slot-number">${slot.slotNumber}</div>
-                                <div class="checkin-hint">Check In</div>
+                                <div class="checkin-hint">Select</div>
                             </a>
                         </c:when>
                         <c:otherwise>
@@ -425,9 +422,9 @@
             </c:forEach>
         </div>
 
-    </div><%-- /parking-lot --%>
+    </div>
 
-</div><%-- /page-container --%>
+</div>
 
 <footer class="layered-footer">
     <div class="footer-grid">
