@@ -29,10 +29,10 @@
         <nav class="full-width-nav">
             <ul>
                 <li><a href="${pageContext.request.contextPath}/home" class="active">Home</a></li>
-                <li><a href="#">Parking Slots</a></li>
-                <li><a href="#">My Vehicles</a></li>
-                <li><a href="#">Tickets</a></li>
-                <li><a href="#">Payments</a></li>
+                <li><a href="${pageContext.request.contextPath}/slots">Parking Slots</a></li>
+                <li><a href="${pageContext.request.contextPath}/vehicle/list">My Vehicles</a></li>
+                <li><a href="${pageContext.request.contextPath}/tickets">Tickets</a></li>
+                <li><a href="${pageContext.request.contextPath}/payment/history">Payments</a></li>
                 <c:if test="${user.role == 'ADMIN'}">
                     <li><a href="${pageContext.request.contextPath}/admin/users">Manage Users</a></li>
                 </c:if>
@@ -87,14 +87,14 @@
                     <div class="qc-desc">Update password and contact number</div>
                 </div>
             </a>
-            <a href="#" class="quick-card">
+            <a href="${pageContext.request.contextPath}/slots" class="quick-card">
                 <div class="qc-icon">&#128663;</div>
                 <div>
                     <div class="qc-title">Find Parking</div>
                     <div class="qc-desc">Browse and book available slots</div>
                 </div>
             </a>
-            <a href="#" class="quick-card">
+            <a href="${pageContext.request.contextPath}/payment/history" class="quick-card">
                 <div class="qc-icon">&#128179;</div>
                 <div>
                     <div class="qc-title">Payments</div>
@@ -118,13 +118,13 @@
     <footer class="layered-footer">
         <div class="footer-grid">
             <div class="f-col">
-                <a href="#">My Vehicles</a>
-                <a href="#">Parking Slots</a>
-                <a href="#">Tickets</a>
-                <a href="#">Payments</a>
+                <a href="${pageContext.request.contextPath}/vehicle/list">My Vehicles</a>
+                <a href="${pageContext.request.contextPath}/slots">Parking Slots</a>
+                <a href="${pageContext.request.contextPath}/tickets">Tickets</a>
+                <a href="${pageContext.request.contextPath}/payment/history">Payments</a>
             </div>
             <div class="f-col">
-                <a href="#">Home</a>
+                <a href="${pageContext.request.contextPath}/home">Home</a>
                 <a href="#">About</a>
                 <a href="#">Help</a>
             </div>
