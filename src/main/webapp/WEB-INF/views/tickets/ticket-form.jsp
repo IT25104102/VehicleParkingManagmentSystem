@@ -164,12 +164,7 @@
                            value="${param.slotNumber}"
                            readonly/>
                 </div>
-                <div class="form-group">
-                    <label>Slot ID</label>
-                    <input type="text" name="slotId"
-                           value="${param.slotId}"
-                           readonly/>
-                </div>
+                 
 
                 <!-- Vehicle type for price calculation -->
                 <div class="form-group full">
