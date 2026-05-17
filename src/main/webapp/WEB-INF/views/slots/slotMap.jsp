@@ -190,7 +190,7 @@
 </header>
 
 <div class="page-container">
-
+<c:if test="${not empty successMsg}">
     <div style="margin-bottom:1.5rem;">
         <h1 class="page-title">🗺 Parking Slot Map</h1>
         <p class="page-subtitle">
