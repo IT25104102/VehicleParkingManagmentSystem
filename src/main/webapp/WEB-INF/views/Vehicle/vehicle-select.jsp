@@ -16,13 +16,11 @@
             margin-bottom: 2rem;
             display: flex; align-items: center; gap: 1rem;
         }
-        .slot-info-bar .slot-badge {
+        .slot-badge {
             background: var(--btn-neon); color: #0a1128;
             padding: 4px 16px; border-radius: 20px;
             font-weight: 800; font-size: 1rem;
         }
-        .slot-info-bar p { color: var(--text-dim); font-size: 0.82rem; margin: 0; }
-
         .section-title {
             font-size: 0.72rem; font-weight: 700;
             text-transform: uppercase; letter-spacing: 0.12em;
@@ -55,7 +53,6 @@
             transition: box-shadow 0.2s;
         }
         .btn-select:hover { box-shadow: 0 0 15px var(--btn-neon); }
-
         .divider-text {
             text-align: center; color: var(--text-dim);
             font-size: 0.78rem; margin: 1.5rem 0;
@@ -68,7 +65,6 @@
         }
         .divider-text::before { left: 0; }
         .divider-text::after  { right: 0; }
-
         .btn-add-new {
             width: 100%; padding: 1rem;
             background: rgba(255,255,255,0.03);
@@ -125,7 +121,10 @@
     <!-- Slot info bar -->
     <div class="slot-info-bar">
         <span class="slot-badge">${slotNumber}</span>
-        <p>You selected this slot &nbsp;·&nbsp; Type: <strong style="color:var(--text-main);">${slotType}</strong></p>
+        <p style="color:var(--text-dim);margin:0;">
+            You selected this slot &nbsp;·&nbsp;
+            Type: <strong style="color:var(--text-main);">${slotType}</strong>
+        </p>
     </div>
 
     <!-- Existing vehicles -->
@@ -145,7 +144,8 @@
                             ${v.vehicleType} &nbsp;·&nbsp; ${v.contactNumber}
                         </div>
                     </div>
-                    <a href="${pageContext.request.contextPath}/tickets/new?vehicleId=${v.vehicleId}&slotId=${slotId}&slotNumber=${slotNumber}&vehicleNumber=${v.licensePlate}"
+                    <%-- Pass ownerName in the URL --%>
+                    <a href="${pageContext.request.contextPath}/tickets/new?vehicleId=${v.vehicleId}&slotId=${slotId}&slotNumber=${slotNumber}&vehicleNumber=${v.licensePlate}&ownerName=${v.ownerName}"
                        class="btn-select">Select →</a>
                 </div>
             </c:forEach>
