@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +11,7 @@
 </head>
 <body>
 
-    <!-- ── Top header (same as smartparking.html) ── -->
+    <!-- ── Top header ── -->
     <header class="main-header">
         <div class="top-bar">
             <div class="logo">
@@ -40,125 +40,81 @@
         </nav>
     </header>
 
-    <!-- ── Sidebar + main layout ── -->
-    <div class="dash-layout">
+    <!-- ── Main content (no sidebar) ── -->
+    <main style="padding: 2rem 5%; max-width: 1400px; margin: 0 auto;">
 
-        <aside class="sidebar">
-            <div class="sb-brand">
-                <span class="sb-icon">&#10018;</span>
-                <h2>MYPARKING</h2>
+        <!-- Welcome banner -->
+        <div class="welcome-banner animate-blur staggered-1">
+            <div class="wb-avatar">${user.name.charAt(0)}</div>
+            <div class="wb-text">
+                <h2>Welcome back, ${user.name}!</h2>
+                <p>MyParking Smart System &nbsp;&middot;&nbsp; ${user.role} &nbsp;&middot;&nbsp; ID: ${user.id}</p>
             </div>
-            <nav class="sb-nav">
-                <a href="${pageContext.request.contextPath}/home"    class="nav-item active">
-                    <i class="nav-icon">&#127968;</i> Dashboard
-                </a>
-                <a href="${pageContext.request.contextPath}/profile" class="nav-item">
-                    <i class="nav-icon">&#128100;</i> My Profile
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="nav-icon">&#128663;</i> Parking Slots
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="nav-icon">&#127765;</i> My Vehicles
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="nav-icon">&#127915;</i> Tickets
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="nav-icon">&#128179;</i> Payments
-                </a>
-                <c:if test="${user.role == 'ADMIN'}">
-                <a href="${pageContext.request.contextPath}/admin/users" class="nav-item">
-                    <i class="nav-icon">&#128101;</i> Manage Users
-                </a>
-                </c:if>
-            </nav>
-            <div class="sb-footer">
-                <div class="user-mini">
-                    <div class="u-avatar">${user.name.charAt(0)}</div>
-                    <div>
-                        <div class="u-name">${user.name}</div>
-                        <div class="u-role">${user.role}</div>
-                    </div>
-                </div>
-                <a href="${pageContext.request.contextPath}/logout" class="btn-logout">Log out</a>
+        </div>
+
+        <!-- Stats row -->
+        <div class="stats-grid animate-blur staggered-2">
+            <div class="stat-card">
+                <div class="stat-lbl">Account ID</div>
+                <div class="stat-val" style="font-size:1.1rem;">${user.id}</div>
             </div>
-        </aside>
-
-        <main class="dash-main">
-
-            <!-- Welcome banner (same card style as feature-card) -->
-            <div class="welcome-banner animate-blur staggered-1">
-                <div class="wb-avatar">${user.name.charAt(0)}</div>
-                <div class="wb-text">
-                    <h2>Welcome back, ${user.name}!</h2>
-                    <p>MyParking Smart System &nbsp;&middot;&nbsp; ${user.role} &nbsp;&middot;&nbsp; ID: ${user.id}</p>
-                </div>
+            <div class="stat-card">
+                <div class="stat-lbl">Role</div>
+                <div class="stat-val" style="font-size:1.1rem;">${user.role}</div>
             </div>
-
-            <!-- Stats row -->
-            <div class="stats-grid animate-blur staggered-2">
-                <div class="stat-card">
-                    <div class="stat-lbl">Account ID</div>
-                    <div class="stat-val" style="font-size:1.1rem;">${user.id}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-lbl">Role</div>
-                    <div class="stat-val" style="font-size:1.1rem;">${user.role}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-lbl">Member Since</div>
-                    <div class="stat-val" style="font-size:1rem;">${user.createdAt}</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-lbl">Member Since</div>
+                <div class="stat-val" style="font-size:1rem;">${user.createdAt}</div>
             </div>
+        </div>
 
-            <!-- Quick actions (same feature-card grid style) -->
-            <p style="font-size:0.8rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:1rem;">
-                Quick Actions
-            </p>
-            <div class="quick-grid animate-blur staggered-3">
-                <a href="${pageContext.request.contextPath}/profile" class="quick-card">
-                    <div class="qc-icon">&#128100;</div>
-                    <div>
-                        <div class="qc-title">My Profile</div>
-                        <div class="qc-desc">View and edit your personal details</div>
-                    </div>
-                </a>
-                <a href="${pageContext.request.contextPath}/profile" class="quick-card">
-                    <div class="qc-icon">&#128274;</div>
-                    <div>
-                        <div class="qc-title">Security</div>
-                        <div class="qc-desc">Update password and contact number</div>
-                    </div>
-                </a>
-                <a href="#" class="quick-card">
-                    <div class="qc-icon">&#128663;</div>
-                    <div>
-                        <div class="qc-title">Find Parking</div>
-                        <div class="qc-desc">Browse and book available slots</div>
-                    </div>
-                </a>
-                <a href="#" class="quick-card">
-                    <div class="qc-icon">&#128179;</div>
-                    <div>
-                        <div class="qc-title">Payments</div>
-                        <div class="qc-desc">View billing history and receipts</div>
-                    </div>
-                </a>
-                <c:if test="${user.role == 'ADMIN'}">
-                <a href="${pageContext.request.contextPath}/admin/users" class="quick-card">
-                    <div class="qc-icon">&#128101;</div>
-                    <div>
-                        <div class="qc-title">Manage Users</div>
-                        <div class="qc-desc">View and delete driver accounts</div>
-                    </div>
-                </a>
-                </c:if>
-            </div>
+        <!-- Quick actions -->
+        <p style="font-size:0.8rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:1rem;">
+            Quick Actions
+        </p>
+        <div class="quick-grid animate-blur staggered-3">
+            <a href="${pageContext.request.contextPath}/profile" class="quick-card">
+                <div class="qc-icon">&#128100;</div>
+                <div>
+                    <div class="qc-title">My Profile</div>
+                    <div class="qc-desc">View and edit your personal details</div>
+                </div>
+            </a>
+            <a href="${pageContext.request.contextPath}/profile" class="quick-card">
+                <div class="qc-icon">&#128274;</div>
+                <div>
+                    <div class="qc-title">Security</div>
+                    <div class="qc-desc">Update password and contact number</div>
+                </div>
+            </a>
+            <a href="#" class="quick-card">
+                <div class="qc-icon">&#128663;</div>
+                <div>
+                    <div class="qc-title">Find Parking</div>
+                    <div class="qc-desc">Browse and book available slots</div>
+                </div>
+            </a>
+            <a href="#" class="quick-card">
+                <div class="qc-icon">&#128179;</div>
+                <div>
+                    <div class="qc-title">Payments</div>
+                    <div class="qc-desc">View billing history and receipts</div>
+                </div>
+            </a>
+            <c:if test="${user.role == 'ADMIN'}">
+            <a href="${pageContext.request.contextPath}/admin/users" class="quick-card">
+                <div class="qc-icon">&#128101;</div>
+                <div>
+                    <div class="qc-title">Manage Users</div>
+                    <div class="qc-desc">View and delete driver accounts</div>
+                </div>
+            </a>
+            </c:if>
+        </div>
 
-        </main>
-    </div>
+    </main>
 
+    <!-- ── Footer ── -->
     <footer class="layered-footer">
         <div class="footer-grid">
             <div class="f-col">
@@ -183,4 +139,3 @@
 
 </body>
 </html>
-
