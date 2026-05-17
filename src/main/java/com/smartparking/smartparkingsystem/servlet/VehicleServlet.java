@@ -14,6 +14,13 @@ public class VehicleServlet {
     @Autowired
     private VehicleService vehicleService;
 
+    // TEST METHOD
+    @GetMapping("/test")
+    @ResponseBody
+    public String test() {
+        return "VehicleServlet is working!";
+    }
+
     // READ — Show all vehicles
     @GetMapping("/list")
     public String list(Model model) {
@@ -33,8 +40,7 @@ public class VehicleServlet {
     public String add(@RequestParam String licensePlate,
                       @RequestParam String ownerName,
                       @RequestParam String vehicleType,
-                      @RequestParam String userId,
-                      Model model) {
+                      @RequestParam String userId) {
         Vehicle v = new Vehicle();
         v.setLicensePlate(licensePlate);
         v.setOwnerName(ownerName);
