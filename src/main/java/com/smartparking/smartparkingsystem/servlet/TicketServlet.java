@@ -15,8 +15,6 @@ public class TicketServlet {
     @Autowired
     private TicketService ticketService;
 
-
-
     // READ — List all active tickets
     @GetMapping("/tickets")
     public String listTickets(Model model) {
@@ -26,16 +24,23 @@ public class TicketServlet {
         model.addAttribute("activeCount", active.size());
         model.addAttribute("totalCount", all.size());
         model.addAttribute("voidedCount", all.stream()
-                .filter(t -> "VOIDED".equals(
-                        t.getStatus())).count());
+                .filter(t -> "VOIDED".equals(t.getStatus())).count());
         return "tickets/ticket-list";
     }
 
     // CREATE — Show generate ticket form
     @GetMapping("/tickets/new")
-    public String showCreateForm(Model model) {
-        model.addAttribute("pageTitle",
-                "Generate Ticket");
+    public String showCreateForm(
+            @RequestParam(required = false) String vehicleId,
+            @RequestParam(required = false) String slotId,
+            @RequestParam(required = false) String slotNumber,
+            @RequestParam(required = false) String vehicleNumber,
+            Model model) {
+        model.addAttribute("vehicleId", vehicleId);
+        model.addAttribute("slotId", slotId);
+        model.addAttribute("slotNumber", slotNumber);
+        model.addAttribute("vehicleNumber", vehicleNumber);
+        model.addAttribute("pageTitle", "Generate Ticket");
         return "tickets/ticket-form";
     }
 
@@ -43,40 +48,51 @@ public class TicketServlet {
     @PostMapping("/tickets/create")
     public String createTicket(
             @RequestParam String vehicleId,
-            @RequestParam (required = false)String slotId,
+            @RequestParam(required = false) String slotId,
+            @RequestParam(required = false) String slotNumber,
             @RequestParam String vehicleNumber,
+            @RequestParam(required = false) String vehicleType,
+            @RequestParam(required = false) String ownerName,
+            @RequestParam(required = false) String hours,
+            @RequestParam(required = false) String totalAmount,
+            @RequestParam(required = false) String date,
             RedirectAttributes ra) {
+
+        // Generate the ticket
         Ticket ticket = ticketService.generateTicket(
                 vehicleId, slotId, vehicleNumber);
-        ra.addFlashAttribute("successMsg",
-                "Ticket " + ticket.getId()
-                        + " generated for " + vehicleNumber);
-        return "redirect:/tickets";
+
+        // Redirect to booking summary page with all details
+        return "redirect:/payment/create"
+                + "?ticketId=" + ticket.getId()
+                + "&vehicleId=" + vehicleId
+                + "&ownerName=" + (ownerName != null ? ownerName : "")
+                + "&vehicleNumber=" + vehicleNumber
+                + "&vehicleType=" + (vehicleType != null ? vehicleType : "")
+                + "&slotNumber=" + (slotNumber != null ? slotNumber : "")
+                + "&slotId=" + (slotId != null ? slotId : "")
+                + "&hours=" + (hours != null ? hours : "")
+                + "&totalAmount=" + (totalAmount != null ? totalAmount : "")
+                + "&date=" + (date != null ? date : "");
     }
 
     // READ — View single ticket details
     @GetMapping("/tickets/{id}")
-    public String viewTicket(
-            @PathVariable String id,
-            Model model) {
+    public String viewTicket(@PathVariable String id, Model model) {
         Ticket ticket = ticketService.findById(id);
         if (ticket == null) return "redirect:/tickets";
         model.addAttribute("ticket", ticket);
-        model.addAttribute("pageTitle",
-                "Ticket Details");
+        model.addAttribute("pageTitle", "Ticket Details");
         return "tickets/ticket-detail";
     }
 
     // UPDATE — Show edit slot form
     @GetMapping("/tickets/{id}/edit")
-    public String showEditForm(
-            @PathVariable String id,
-            Model model) {
+    public String showEditForm(@PathVariable String id, Model model) {
         Ticket ticket = ticketService.findById(id);
         if (ticket == null) return "redirect:/tickets";
         model.addAttribute("ticket", ticket);
-        model.addAttribute("pageTitle",
-                "Reassign Slot");
+        model.addAttribute("pageTitle", "Reassign Slot");
         return "tickets/edit-ticket";
     }
 
@@ -86,30 +102,23 @@ public class TicketServlet {
             @PathVariable String id,
             @RequestParam String newSlotId,
             RedirectAttributes ra) {
-        boolean ok = ticketService.updateTicketSlot(
-                id, newSlotId);
+        boolean ok = ticketService.updateTicketSlot(id, newSlotId);
         if (ok) {
-            ra.addFlashAttribute("successMsg",
-                    "Slot updated successfully!");
+            ra.addFlashAttribute("successMsg", "Slot updated successfully!");
         } else {
-            ra.addFlashAttribute("errorMsg",
-                    "Could not update ticket.");
+            ra.addFlashAttribute("errorMsg", "Could not update ticket.");
         }
         return "redirect:/tickets";
     }
 
     // DELETE — Void a ticket
     @PostMapping("/tickets/{id}/void")
-    public String voidTicket(
-            @PathVariable String id,
-            RedirectAttributes ra) {
+    public String voidTicket(@PathVariable String id, RedirectAttributes ra) {
         boolean ok = ticketService.voidTicket(id);
         if (ok) {
-            ra.addFlashAttribute("successMsg",
-                    "Ticket voided successfully!");
+            ra.addFlashAttribute("successMsg", "Ticket voided successfully!");
         } else {
-            ra.addFlashAttribute("errorMsg",
-                    "Could not void ticket.");
+            ra.addFlashAttribute("errorMsg", "Could not void ticket.");
         }
         return "redirect:/tickets";
     }
