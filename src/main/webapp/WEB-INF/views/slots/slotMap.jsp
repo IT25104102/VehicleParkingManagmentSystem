@@ -210,28 +210,24 @@
     </c:if>
 
     <!-- Stats -->
-    <div class="stats-grid">
-        <div class="stat-card cyan">
-            <div class="stat-number">${totalSlots}</div>
-            <div class="stat-label">Total Slots</div>
-        </div>
-        <div class="stat-card green">
-            <div class="stat-number">${available}</div>
-            <div class="stat-label">Available</div>
-        </div>
-        <div class="stat-card red">
-            <div class="stat-number">${occupied}</div>
-            <div class="stat-label">Occupied</div>
-        </div>
-        <div class="stat-card yellow">
-            <div class="stat-number">${pending}</div>
-            <div class="stat-label">Pending</div>
-        </div>
-        <div class="stat-card brown">
-            <div class="stat-number">${preReserved}</div>
-            <div class="stat-label">Pre-Reserved</div>
-        </div>
+<div class="stats-grid" style="grid-template-columns: repeat(4,1fr);">
+    <div class="stat-card green">
+        <div class="stat-number">${available}</div>
+        <div class="stat-label">Available</div>
     </div>
+    <div class="stat-card red">
+        <div class="stat-number">${occupied}</div>
+        <div class="stat-label">Occupied</div>
+    </div>
+    <div class="stat-card yellow">
+        <div class="stat-number">${pending}</div>
+        <div class="stat-label">Pending</div>
+    </div>
+    <div class="stat-card brown">
+        <div class="stat-number">${preReserved}</div>
+        <div class="stat-label">Pre-Reserved</div>
+    </div>
+</div>
 
     <!-- Legend -->
     <div class="map-legend">
