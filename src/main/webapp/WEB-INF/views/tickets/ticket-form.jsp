@@ -17,11 +17,9 @@
         }
         .form-card h2 { color: white; font-size: 1.4rem; margin-bottom: 8px; }
         .form-card p  { color: var(--text-dim); font-size: .82rem; margin-bottom: 30px; }
-
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
         .form-group { display: flex; flex-direction: column; gap: 8px; }
         .form-group.full { grid-column: 1 / -1; }
-
         label { color: var(--cyan); font-size: .7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
         input, select {
             padding: 12px 16px;
@@ -35,15 +33,11 @@
         input::placeholder { color: #2a3a55; }
         input[readonly] { opacity: 0.7; cursor: not-allowed; border-color: rgba(26,217,240,0.15); }
         select option { background: #0a1128; color: white; }
-
         .form-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 26px 0; }
-
-        /* Price chart */
         .price-chart {
             background: rgba(255,255,255,0.02);
             border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 12px; padding: 1.2rem;
-            margin-bottom: 1.5rem;
+            border-radius: 12px; padding: 1.2rem; margin-bottom: 1.5rem;
         }
         .price-chart-title {
             font-size: 0.7rem; font-weight: 700;
@@ -54,13 +48,10 @@
         .price-item {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 8px; padding: 0.8rem;
-            text-align: center;
+            border-radius: 8px; padding: 0.8rem; text-align: center;
         }
         .price-type { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 4px; }
         .price-amount { font-size: 1rem; font-weight: 800; color: var(--btn-neon); }
-
-        /* Total amount */
         .total-box {
             background: rgba(55,255,139,0.05);
             border: 1px solid rgba(55,255,139,0.2);
@@ -69,7 +60,6 @@
         }
         .total-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
         .total-amount { font-size: 2rem; font-weight: 800; color: var(--btn-neon); }
-
         .btn-generate {
             width: 100%; padding: 14px;
             background: var(--btn-neon); color: #0c1a12;
@@ -79,8 +69,6 @@
         }
         .btn-generate:hover { transform: translateY(-3px); box-shadow: 0 0 20px var(--btn-neon); }
         .back-link { display: block; text-align: center; margin-top: 18px; color: var(--text-dim); font-size: .8rem; }
-        .back-link:hover { color: var(--cyan); }
-
         @keyframes blurClear { from { filter:blur(8px); opacity:0; transform:translateY(10px); } to { filter:blur(0); opacity:1; transform:translateY(0); } }
     </style>
 </head>
@@ -143,30 +131,34 @@
 
         <form action="${pageContext.request.contextPath}/tickets/create" method="post">
 
+            <%-- Hidden fields — pass all info through --%>
+            <input type="hidden" name="ownerName"     value="${param.ownerName}"/>
+            <input type="hidden" name="slotId"        value="${param.slotId}"/>
+            <input type="hidden" name="slotNumber"    value="${param.slotNumber}"/>
+
             <div class="form-grid">
 
-                <!-- Auto-filled fields -->
                 <div class="form-group">
                     <label>Vehicle ID</label>
                     <input type="text" name="vehicleId"
-                           value="${param.vehicleId}"
-                           readonly/>
+                           value="${param.vehicleId}" readonly/>
                 </div>
                 <div class="form-group">
                     <label>Vehicle Number</label>
                     <input type="text" name="vehicleNumber"
-                           value="${param.vehicleNumber}"
-                           readonly/>
+                           value="${param.vehicleNumber}" readonly/>
+                </div>
+                <div class="form-group">
+                    <label>Owner Name</label>
+                    <input type="text"
+                           value="${param.ownerName}" readonly/>
                 </div>
                 <div class="form-group">
                     <label>Parking Slot</label>
-                    <input type="text" name="slotNumber"
-                           value="${param.slotNumber}"
-                           readonly/>
+                    <input type="text"
+                           value="${param.slotNumber}" readonly/>
                 </div>
-                 
 
-                <!-- Vehicle type for price calculation -->
                 <div class="form-group full">
                     <label>Vehicle Type</label>
                     <select name="vehicleType" id="vehicleType"
@@ -180,7 +172,6 @@
                     </select>
                 </div>
 
-                <!-- Duration -->
                 <div class="form-group full">
                     <label>Duration (Hours)</label>
                     <input type="number" name="hours" id="hours"
