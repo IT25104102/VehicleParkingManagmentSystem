@@ -164,7 +164,6 @@
         <div class="f-col">
             <a href="${pageContext.request.contextPath}/slots">Parking Slots</a>
             <a href="${pageContext.request.contextPath}/vehicle/list">My Vehicles</a>
-            <a href="${pageContext.request.contextPath}/tickets">Tickets</a>
             <a href="${pageContext.request.contextPath}/payment/history">Payments</a>
         </div>
         <div class="f-col contact-info">
