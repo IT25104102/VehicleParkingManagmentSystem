@@ -3,6 +3,7 @@ package com.smartparking.smartparkingsystem.servlet;
 import com.smartparking.smartparkingsystem.model.Payment;
 import com.smartparking.smartparkingsystem.model.User;
 import com.smartparking.smartparkingsystem.service.PaymentService;
+import com.smartparking.smartparkingsystem.service.ParkingSlotService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +17,9 @@ public class PaymentServlet {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private ParkingSlotService slotService;
+
     // SHOW amount summary page
     @GetMapping("/create")
     public String showCreate() {
@@ -24,15 +28,19 @@ public class PaymentServlet {
 
     // CREATE payment and go to payment method page
     @PostMapping("/create")
-    public String create(@RequestParam String ticketId,
-                         @RequestParam double hours,
-                         @RequestParam String vehicleType,
-                         @RequestParam(required = false) String slot,
-                         @RequestParam(required = false) String vehicleNumber,
-                         @RequestParam(required = false) String date,
-                         Model model) {
+    public String create(
+            @RequestParam String ticketId,
+            @RequestParam double hours,
+            @RequestParam String vehicleType,
+            @RequestParam(required = false) String slotId,
+            @RequestParam(required = false) String slot,
+            @RequestParam(required = false) String vehicleNumber,
+            @RequestParam(required = false) String date,
+            Model model) {
         Payment p = paymentService.createPayment(ticketId, hours, vehicleType);
+        // Pass slotId to receipt for later use
         model.addAttribute("payment", p);
+        model.addAttribute("slotId", slotId);
         return "payment/receipt";
     }
 
@@ -40,7 +48,6 @@ public class PaymentServlet {
     @GetMapping("/history")
     public String history(HttpSession session, Model model) {
         model.addAttribute("payments", paymentService.getAllPayments());
-        // Pass user role so JSP can show/hide admin actions
         User user = (User) session.getAttribute("loggedInUser");
         if (user != null) {
             model.addAttribute("userRole", user.getRole());
@@ -50,16 +57,28 @@ public class PaymentServlet {
 
     // SHOW cash confirm page
     @GetMapping("/cash")
-    public String showCash(@RequestParam String id, Model model) {
+    public String showCash(@RequestParam String id,
+                           @RequestParam(required = false) String slotId,
+                           Model model) {
         Payment p = paymentService.findById(id);
         model.addAttribute("payment", p);
+        model.addAttribute("slotId", slotId);
         return "payment/cash";
     }
 
-    // CONFIRM cash payment → go to ticket
+    // CONFIRM cash payment → mark slot OCCUPIED → go to ticket
     @PostMapping("/confirmCash")
-    public String confirmCash(@RequestParam String id, Model model) {
+    public String confirmCash(
+            @RequestParam String id,
+            @RequestParam(required = false) String slotId,
+            Model model) {
         paymentService.updateStatus(id, "PENDING");
+
+        // Mark slot as OCCUPIED
+        if (slotId != null && !slotId.isEmpty()) {
+            slotService.setOccupied(slotId);
+        }
+
         Payment p = paymentService.findById(id);
         model.addAttribute("payment", p);
         return "payment/ticket";
@@ -67,19 +86,30 @@ public class PaymentServlet {
 
     // SHOW card payment page
     @GetMapping("/card")
-    public String showCard(@RequestParam String id, Model model) {
+    public String showCard(@RequestParam String id,
+                           @RequestParam(required = false) String slotId,
+                           Model model) {
         Payment p = paymentService.findById(id);
         model.addAttribute("payment", p);
+        model.addAttribute("slotId", slotId);
         return "payment/card";
     }
 
-    // CONFIRM card payment → go to ticket
+    // CONFIRM card payment → mark slot OCCUPIED → go to ticket
     @PostMapping("/confirmCard")
-    public String confirmCard(@RequestParam String id,
-                              @RequestParam String cardNumber,
-                              @RequestParam String cardName,
-                              Model model) {
+    public String confirmCard(
+            @RequestParam String id,
+            @RequestParam String cardNumber,
+            @RequestParam String cardName,
+            @RequestParam(required = false) String slotId,
+            Model model) {
         paymentService.updateStatus(id, "COMPLETED");
+
+        // Mark slot as OCCUPIED
+        if (slotId != null && !slotId.isEmpty()) {
+            slotService.setOccupied(slotId);
+        }
+
         Payment p = paymentService.findById(id);
         model.addAttribute("payment", p);
         return "payment/ticket";
