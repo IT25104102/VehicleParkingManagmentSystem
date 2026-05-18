@@ -83,6 +83,7 @@
             <li><a href="<%= request.getContextPath() %>/admin/price">Pricing</a></li>
             <li><a href="<%= request.getContextPath() %>/slots/manage">Manage Slots</a></li>
             <li><a href="<%= request.getContextPath() %>/admin/users">Manage Users</a></li>
+            <li><a href="<%= request.getContextPath() %>/tickets">Tickets</a></li>
         </ul>
     </nav>
 </header>
