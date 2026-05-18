@@ -90,7 +90,6 @@
             <li><a href="${pageContext.request.contextPath}/home">Home</a></li>
             <li><a href="${pageContext.request.contextPath}/slots">Parking Slots</a></li>
             <li><a href="${pageContext.request.contextPath}/vehicle/list" class="active">My Vehicles</a></li>
-            <li><a href="${pageContext.request.contextPath}/tickets">Tickets</a></li>
             <li><a href="${pageContext.request.contextPath}/payment/history">Payments</a></li>
         </ul>
     </nav>
