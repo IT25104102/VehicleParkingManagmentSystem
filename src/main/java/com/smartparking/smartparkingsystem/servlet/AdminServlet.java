@@ -30,11 +30,14 @@ public class AdminServlet {
         return "admin/reports";
     }
 
-    // READ/UPDATE — Price page
+    // READ — Price page
     @GetMapping("/price")
     public String pricePage(Model model) {
-        double currentPrice = adminService.getCurrentPrice();
-        model.addAttribute("currentPrice", currentPrice);
+        model.addAttribute("bikeRate",         adminService.getRateByType("BIKE"));
+        model.addAttribute("threeWheelerRate", adminService.getRateByType("THREE_WHEELER"));
+        model.addAttribute("carRate",          adminService.getRateByType("CAR"));
+        model.addAttribute("vanRate",          adminService.getRateByType("VAN"));
+        model.addAttribute("vipRate",          adminService.getRateByType("VIP"));
         return "admin/price";
     }
 
@@ -49,36 +52,37 @@ public class AdminServlet {
                 + " — Vehicles: "
                 + generatedLog.getTotalVehicles()
                 + ", Income: Rs."
-                + String.format("%.2f",
-                    generatedLog.getIncome()));
+                + String.format("%.2f", generatedLog.getIncome()));
         } else {
-            session.setAttribute("errorMessage",
-                "Failed to generate daily summary.");
+            session.setAttribute("errorMessage", "Failed to generate daily summary.");
         }
         return "redirect:/admin/dashboard";
     }
 
-    // UPDATE — Price per hour
+    // UPDATE — Save all rates
     @PostMapping("/price")
     public String updatePrice(
-            @RequestParam String price,
+            @RequestParam(required = false) String bikerate,
+            @RequestParam(required = false) String threewheelerrate,
+            @RequestParam(required = false) String carrate,
+            @RequestParam(required = false) String vanrate,
+            @RequestParam(required = false) String viprate,
             HttpSession session) {
         try {
-            double newPrice = Double.parseDouble(price);
-            boolean updated =
-                adminService.updatePricePerHour(newPrice);
+            boolean updated = true;
+            if (bikerate != null)          updated &= adminService.updateRateByType("BIKE",          Double.parseDouble(bikerate));
+            if (threewheelerrate != null)  updated &= adminService.updateRateByType("THREE_WHEELER",  Double.parseDouble(threewheelerrate));
+            if (carrate != null)           updated &= adminService.updateRateByType("CAR",            Double.parseDouble(carrate));
+            if (vanrate != null)           updated &= adminService.updateRateByType("VAN",            Double.parseDouble(vanrate));
+            if (viprate != null)           updated &= adminService.updateRateByType("VIP",            Double.parseDouble(viprate));
+
             if (updated) {
-                session.setAttribute("successMessage",
-                    "Price updated to Rs."
-                    + String.format("%.2f", newPrice)
-                    + "/hour.");
+                session.setAttribute("successMessage", "All rates updated successfully!");
             } else {
-                session.setAttribute("errorMessage",
-                    "Failed to update price. Must be greater than 0.");
+                session.setAttribute("errorMessage", "Some rates failed to update.");
             }
         } catch (NumberFormatException e) {
-            session.setAttribute("errorMessage",
-                "Invalid price entered.");
+            session.setAttribute("errorMessage", "Invalid price entered.");
         }
         return "redirect:/admin/price";
     }
@@ -89,11 +93,9 @@ public class AdminServlet {
         int deleted = adminService.deleteOldLogs();
         if (deleted >= 0) {
             session.setAttribute("successMessage",
-                "Cleanup complete. Removed "
-                + deleted + " old log entries.");
+                "Cleanup complete. Removed " + deleted + " old log entries.");
         } else {
-            session.setAttribute("errorMessage",
-                "Log cleanup failed.");
+            session.setAttribute("errorMessage", "Log cleanup failed.");
         }
         return "redirect:/admin/dashboard";
     }
