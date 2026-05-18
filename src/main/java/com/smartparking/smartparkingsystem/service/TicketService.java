@@ -19,8 +19,7 @@ public class TicketService {
         ticket.setId(FileUtil.generateId("TKT"));
         ticket.setVehicleId(vehicleId);
         ticket.setSlotId(slotId);
-        ticket.setVehicleNumber(
-            vehicleNumber.toUpperCase());
+        ticket.setVehicleNumber(vehicleNumber.toUpperCase());
         ticket.setCheckInTime(LocalDateTime.now());
         ticket.setStatus("ACTIVE");
         ticket.setCreatedAt(LocalDateTime.now());
@@ -34,12 +33,11 @@ public class TicketService {
         for (String line : FileUtil.readAll(FILE)) {
             if (line.trim().isEmpty()) continue;
             try {
-                Ticket t = new Ticket();
-                t.fromFileString(line);
-                list.add(t);
+                // ✅ Use static method correctly
+                Ticket t = Ticket.fromFileString(line);
+                if (t != null) list.add(t);
             } catch (Exception e) {
-                System.err.println("Error reading ticket: "
-                    + e.getMessage());
+                System.err.println("Error reading ticket: " + e.getMessage());
             }
         }
         return list;
@@ -55,23 +53,21 @@ public class TicketService {
     // READ — Find by ID
     public Ticket findById(String id) {
         for (Ticket t : getAllTickets()) {
-            if (t.getId().equals(id)) return t;
+            if (t.getId() != null && t.getId().equals(id)) return t;
         }
         return null;
     }
 
     // UPDATE — Reassign slot
-    public boolean updateTicketSlot(String ticketId,
-            String newSlotId) {
+    public boolean updateTicketSlot(String ticketId, String newSlotId) {
         List<String> lines = FileUtil.readAll(FILE);
         List<String> updated = new ArrayList<>();
         boolean found = false;
         for (String line : lines) {
             if (line.trim().isEmpty()) continue;
             try {
-                Ticket t = new Ticket();
-                t.fromFileString(line);
-                if (t.getId().equals(ticketId)
+                Ticket t = Ticket.fromFileString(line);
+                if (t != null && t.getId().equals(ticketId)
                         && "ACTIVE".equals(t.getStatus())) {
                     t.setSlotId(newSlotId);
                     updated.add(t.toFileString());
@@ -95,9 +91,8 @@ public class TicketService {
         for (String line : lines) {
             if (line.trim().isEmpty()) continue;
             try {
-                Ticket t = new Ticket();
-                t.fromFileString(line);
-                if (t.getId().equals(ticketId)
+                Ticket t = Ticket.fromFileString(line);
+                if (t != null && t.getId().equals(ticketId)
                         && "ACTIVE".equals(t.getStatus())) {
                     t.setStatus("VOIDED");
                     t.setCheckOutTime(LocalDateTime.now());
