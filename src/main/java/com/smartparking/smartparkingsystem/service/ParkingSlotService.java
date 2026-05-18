@@ -145,6 +145,30 @@ public class ParkingSlotService {
         FileUtil.writeAll(FILE, updated);
         return newStatus;
     }
+    // UPDATE — Set slot to OCCUPIED directly
+public boolean setOccupied(String id) {
+    List<String> lines = FileUtil.readAll(FILE);
+    List<String> updated = new ArrayList<>();
+    boolean found = false;
+    for (String line : lines) {
+        if (line.trim().isEmpty()) continue;
+        try {
+            ParkingSlot slot = ParkingSlot.fromFileString(line);
+            if (slot == null) continue;
+            if (slot.getId().equals(id)) {
+                slot.setStatus(ParkingSlot.Status.OCCUPIED);
+                updated.add(slot.toFileString());
+                found = true;
+            } else {
+                updated.add(line);
+            }
+        } catch (Exception e) {
+            updated.add(line);
+        }
+    }
+    if (found) FileUtil.writeAll(FILE, updated);
+    return found;
+}
 
     // DELETE — Remove slot
     public boolean deleteSlot(String id) {
