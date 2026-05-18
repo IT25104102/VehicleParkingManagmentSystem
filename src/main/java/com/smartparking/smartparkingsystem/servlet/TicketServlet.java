@@ -51,11 +51,11 @@ public class TicketServlet {
         model.addAttribute("pageTitle",    "Generate Ticket");
 
         // Load rates from config
-        model.addAttribute("bikeRate",          adminService.getRateByType("BIKE"));
-        model.addAttribute("threeWheelerRate",  adminService.getRateByType("THREE_WHEELER"));
-        model.addAttribute("carRate",           adminService.getRateByType("CAR"));
-        model.addAttribute("vanRate",           adminService.getRateByType("VAN"));
-        model.addAttribute("vipRate",           adminService.getRateByType("VIP"));
+        model.addAttribute("bikeRate",         (int) adminService.getRateByType("BIKE"));
+model.addAttribute("threeWheelerRate", (int) adminService.getRateByType("THREE_WHEELER"));
+model.addAttribute("carRate",          (int) adminService.getRateByType("CAR"));
+model.addAttribute("vanRate",          (int) adminService.getRateByType("VAN"));
+model.addAttribute("vipRate",          (int) adminService.getRateByType("VIP"));
 
         return "tickets/ticket-form";
     }
