@@ -1,6 +1,7 @@
 package com.smartparking.smartparkingsystem.servlet;
 
 import com.smartparking.smartparkingsystem.model.Ticket;
+import com.smartparking.smartparkingsystem.service.AdminService;
 import com.smartparking.smartparkingsystem.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,8 @@ public class TicketServlet {
 
     @Autowired
     private TicketService ticketService;
+
+    private AdminService adminService = new AdminService();
 
     // READ — List all active tickets
     @GetMapping("/tickets")
@@ -35,12 +38,25 @@ public class TicketServlet {
             @RequestParam(required = false) String slotId,
             @RequestParam(required = false) String slotNumber,
             @RequestParam(required = false) String vehicleNumber,
+            @RequestParam(required = false) String ownerName,
+            @RequestParam(required = false) String date,
             Model model) {
-        model.addAttribute("vehicleId", vehicleId);
-        model.addAttribute("slotId", slotId);
-        model.addAttribute("slotNumber", slotNumber);
+
+        model.addAttribute("vehicleId",    vehicleId);
+        model.addAttribute("slotId",       slotId);
+        model.addAttribute("slotNumber",   slotNumber);
         model.addAttribute("vehicleNumber", vehicleNumber);
-        model.addAttribute("pageTitle", "Generate Ticket");
+        model.addAttribute("ownerName",    ownerName);
+        model.addAttribute("date",         date);
+        model.addAttribute("pageTitle",    "Generate Ticket");
+
+        // Load rates from config
+        model.addAttribute("bikeRate",          adminService.getRateByType("BIKE"));
+        model.addAttribute("threeWheelerRate",  adminService.getRateByType("THREE_WHEELER"));
+        model.addAttribute("carRate",           adminService.getRateByType("CAR"));
+        model.addAttribute("vanRate",           adminService.getRateByType("VAN"));
+        model.addAttribute("vipRate",           adminService.getRateByType("VIP"));
+
         return "tickets/ticket-form";
     }
 
@@ -58,22 +74,20 @@ public class TicketServlet {
             @RequestParam(required = false) String date,
             RedirectAttributes ra) {
 
-        // Generate the ticket
         Ticket ticket = ticketService.generateTicket(
                 vehicleId, slotId, vehicleNumber);
 
-        // Redirect to booking summary page with all details
         return "redirect:/payment/create"
-                + "?ticketId=" + ticket.getId()
-                + "&vehicleId=" + vehicleId
-                + "&ownerName=" + (ownerName != null ? ownerName : "")
+                + "?ticketId="      + ticket.getId()
+                + "&vehicleId="     + vehicleId
+                + "&ownerName="     + (ownerName != null ? ownerName : "")
                 + "&vehicleNumber=" + vehicleNumber
-                + "&vehicleType=" + (vehicleType != null ? vehicleType : "")
-                + "&slotNumber=" + (slotNumber != null ? slotNumber : "")
-                + "&slotId=" + (slotId != null ? slotId : "")
-                + "&hours=" + (hours != null ? hours : "")
-                + "&totalAmount=" + (totalAmount != null ? totalAmount : "")
-                + "&date=" + (date != null ? date : "");
+                + "&vehicleType="   + (vehicleType != null ? vehicleType : "")
+                + "&slotNumber="    + (slotNumber != null ? slotNumber : "")
+                + "&slotId="        + (slotId != null ? slotId : "")
+                + "&hours="         + (hours != null ? hours : "")
+                + "&totalAmount="   + (totalAmount != null ? totalAmount : "")
+                + "&date="          + (date != null ? date : "");
     }
 
     // READ — View single ticket details
