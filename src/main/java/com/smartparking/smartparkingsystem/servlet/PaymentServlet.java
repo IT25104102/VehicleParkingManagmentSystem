@@ -1,7 +1,9 @@
 package com.smartparking.smartparkingsystem.servlet;
 
 import com.smartparking.smartparkingsystem.model.Payment;
+import com.smartparking.smartparkingsystem.model.User;
 import com.smartparking.smartparkingsystem.service.PaymentService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,24 +31,26 @@ public class PaymentServlet {
                          @RequestParam(required = false) String vehicleNumber,
                          @RequestParam(required = false) String date,
                          Model model) {
-        Payment p = paymentService.createPayment(
-                ticketId, hours, vehicleType);
+        Payment p = paymentService.createPayment(ticketId, hours, vehicleType);
         model.addAttribute("payment", p);
         return "payment/receipt";
     }
 
     // SHOW payment history
     @GetMapping("/history")
-    public String history(Model model) {
-        model.addAttribute("payments",
-                paymentService.getAllPayments());
+    public String history(HttpSession session, Model model) {
+        model.addAttribute("payments", paymentService.getAllPayments());
+        // Pass user role so JSP can show/hide admin actions
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user != null) {
+            model.addAttribute("userRole", user.getRole());
+        }
         return "payment/history";
     }
 
     // SHOW cash confirm page
     @GetMapping("/cash")
-    public String showCash(@RequestParam String id,
-                           Model model) {
+    public String showCash(@RequestParam String id, Model model) {
         Payment p = paymentService.findById(id);
         model.addAttribute("payment", p);
         return "payment/cash";
@@ -54,8 +58,7 @@ public class PaymentServlet {
 
     // CONFIRM cash payment → go to ticket
     @PostMapping("/confirmCash")
-    public String confirmCash(@RequestParam String id,
-                              Model model) {
+    public String confirmCash(@RequestParam String id, Model model) {
         paymentService.updateStatus(id, "PENDING");
         Payment p = paymentService.findById(id);
         model.addAttribute("payment", p);
@@ -64,8 +67,7 @@ public class PaymentServlet {
 
     // SHOW card payment page
     @GetMapping("/card")
-    public String showCard(@RequestParam String id,
-                           Model model) {
+    public String showCard(@RequestParam String id, Model model) {
         Payment p = paymentService.findById(id);
         model.addAttribute("payment", p);
         return "payment/card";
