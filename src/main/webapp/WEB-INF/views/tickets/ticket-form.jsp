@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MyParking | Generate Ticket</title>
+    <title>ParkCity | Generate Ticket</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
@@ -64,7 +64,7 @@
 
 <header class="main-header">
     <div class="top-bar">
-        <div class="logo"><span class="logo-icon">&#10018;</span> MyParking</div>
+        <div class="logo"><span class="logo-icon">&#10018;</span> ParkCity</div>
         <div class="header-controls">
             <a href="${pageContext.request.contextPath}/profile">
                 <button class="btn-sm">${sessionScope.loggedInUser.name}</button>
@@ -90,29 +90,29 @@
         <h2>&#127915; Generate Parking Ticket</h2>
         <p>Vehicle and slot details are pre-filled — just select duration</p>
 
-        <!-- Price Chart -->
+        <!-- Price Chart — loaded from config -->
         <div class="price-chart">
             <div class="price-chart-title">Rate Chart</div>
             <div class="price-grid">
                 <div class="price-item">
                     <div class="price-type">Bike</div>
-                    <div class="price-amount">Rs.200/hr</div>
+                    <div class="price-amount">Rs.${bikeRate}/hr</div>
                 </div>
                 <div class="price-item">
                     <div class="price-type">Three Wheeler</div>
-                    <div class="price-amount">Rs.250/hr</div>
+                    <div class="price-amount">Rs.${threeWheelerRate}/hr</div>
                 </div>
                 <div class="price-item">
                     <div class="price-type">Car</div>
-                    <div class="price-amount">Rs.350/hr</div>
+                    <div class="price-amount">Rs.${carRate}/hr</div>
                 </div>
                 <div class="price-item">
                     <div class="price-type">Van</div>
-                    <div class="price-amount">Rs.550/hr</div>
+                    <div class="price-amount">Rs.${vanRate}/hr</div>
                 </div>
                 <div class="price-item">
                     <div class="price-type">VIP Vehicle</div>
-                    <div class="price-amount">Rs.800/hr</div>
+                    <div class="price-amount">Rs.${vipRate}/hr</div>
                 </div>
             </div>
         </div>
@@ -120,46 +120,48 @@
         <form action="${pageContext.request.contextPath}/tickets/create" method="post">
 
             <%-- Hidden fields --%>
-            <input type="hidden" name="ownerName"  value="${param.ownerName}"/>
-            <input type="hidden" name="slotId"     value="${param.slotId}"/>
-            <input type="hidden" name="slotNumber" value="${param.slotNumber}"/>
-            <input type="hidden" name="date"       value="${param.date}"/>
+            <input type="hidden" name="ownerName"  value="${ownerName}"/>
+            <input type="hidden" name="slotId"     value="${slotId}"/>
+            <input type="hidden" name="slotNumber" value="${slotNumber}"/>
+            <input type="hidden" name="date"       value="${date}"/>
 
             <div class="form-grid">
                 <div class="form-group">
                     <label>Vehicle ID</label>
                     <input type="text" name="vehicleId"
-                           value="${param.vehicleId}" readonly/>
+                           value="${vehicleId}" readonly/>
                 </div>
                 <div class="form-group">
                     <label>Vehicle Number</label>
                     <input type="text" name="vehicleNumber"
-                           value="${param.vehicleNumber}" readonly/>
+                           value="${vehicleNumber}" readonly/>
                 </div>
                 <div class="form-group">
                     <label>Owner Name</label>
-                    <input type="text" value="${param.ownerName}" readonly/>
+                    <input type="text" value="${ownerName}" readonly/>
                 </div>
                 <div class="form-group">
                     <label>Parking Slot</label>
-                    <input type="text" value="${param.slotNumber}" readonly/>
+                    <input type="text" value="${slotNumber}" readonly/>
                 </div>
                 <div class="form-group">
                     <label>Date</label>
-                    <input type="text" value="${param.date}" readonly/>
+                    <input type="text" value="${date}" readonly/>
                 </div>
+
                 <div class="form-group full">
                     <label>Vehicle Type</label>
                     <select name="vehicleType" id="vehicleType"
                             onchange="calculateTotal()" required>
                         <option value="">-- Select Vehicle Type --</option>
-                        <option value="Bike">Bike — Rs.200/hr</option>
-                        <option value="Three-Wheeler">Three Wheeler — Rs.250/hr</option>
-                        <option value="Car">Car — Rs.350/hr</option>
-                        <option value="Van">Van — Rs.550/hr</option>
-                        <option value="VIP">VIP Vehicle — Rs.800/hr</option>
+                        <option value="Bike">Bike — Rs.${bikeRate}/hr</option>
+                        <option value="Three-Wheeler">Three Wheeler — Rs.${threeWheelerRate}/hr</option>
+                        <option value="Car">Car — Rs.${carRate}/hr</option>
+                        <option value="Van">Van — Rs.${vanRate}/hr</option>
+                        <option value="VIP">VIP Vehicle — Rs.${vipRate}/hr</option>
                     </select>
                 </div>
+
                 <div class="form-group full">
                     <label>Duration (Hours)</label>
                     <input type="number" name="hours" id="hours"
@@ -168,7 +170,6 @@
                 </div>
             </div>
 
-            <!-- Total Amount -->
             <div class="total-box">
                 <div class="total-label">Total Amount</div>
                 <div class="total-amount" id="totalDisplay">Rs. 0.00</div>
@@ -198,7 +199,7 @@
         </div>
         <div class="f-col contact-info">
             <strong>Contact us:</strong>
-            <p>MyParking@gmail.com</p>
+            <p>ParkCity@gmail.com</p>
             <p>0712345678</p>
         </div>
     </div>
@@ -206,9 +207,13 @@
 
 <script>
     const rates = {
-        'Bike': 200, 'Three-Wheeler': 250,
-        'Car': 350, 'Van': 550, 'VIP': 800
+        'Bike':          ${bikeRate},
+        'Three-Wheeler': ${threeWheelerRate},
+        'Car':           ${carRate},
+        'Van':           ${vanRate},
+        'VIP':           ${vipRate}
     };
+
     function calculateTotal() {
         const type  = document.getElementById('vehicleType').value;
         const hours = parseFloat(document.getElementById('hours').value) || 0;
@@ -217,5 +222,6 @@
         document.getElementById('totalAmount').value = total.toFixed(2);
     }
 </script>
+
 </body>
 </html>
