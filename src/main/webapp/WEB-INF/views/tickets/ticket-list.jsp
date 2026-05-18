@@ -200,18 +200,18 @@
     </div>
 </div>
 
-<footer class="layered-footer">
+ <footer class="layered-footer">
     <div class="footer-grid">
         <div class="f-col">
-            <a href="${pageContext.request.contextPath}/home">Home</a>
-            <a href="#">About</a>
-            <a href="#">Help</a>
+            <a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a>
+            <a href="${pageContext.request.contextPath}/admin/reports">Reports</a>
+            <a href="${pageContext.request.contextPath}/admin/price">Pricing</a>
         </div>
         <div class="f-col">
-            <a href="${pageContext.request.contextPath}/slots">Parking Slots</a>
-            <a href="${pageContext.request.contextPath}/vehicle/list">My Vehicles</a>
-            <a href="${pageContext.request.contextPath}/tickets">Tickets</a>
+            <a href="${pageContext.request.contextPath}/slots/manage">Manage Slots</a>
+            <a href="${pageContext.request.contextPath}/admin/users">Manage Users</a>
             <a href="${pageContext.request.contextPath}/payment/history">Payments</a>
+            <a href="${pageContext.request.contextPath}/tickets">Tickets</a>
         </div>
         <div class="f-col contact-info">
             <strong>Contact us:</strong>
