@@ -96,6 +96,7 @@
                     <li><a href="${pageContext.request.contextPath}/slots/manage">Manage Slots</a></li>
                     <li><a href="${pageContext.request.contextPath}/admin/users">Manage Users</a></li>
                     <li><a href="${pageContext.request.contextPath}/payment/history" class="active">Payments</a></li>
+                    <li><a href="${pageContext.request.contextPath}/tickets">Tickets</a></li>
                 </ul>
             </c:when>
             <c:otherwise>
