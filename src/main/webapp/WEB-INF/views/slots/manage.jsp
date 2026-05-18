@@ -329,8 +329,7 @@
     </div>
 </div>
 
-<!-- Footer -->
-<footer class="layered-footer">
+ <footer class="layered-footer">
     <div class="footer-grid">
         <div class="f-col">
             <a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a>
@@ -340,14 +339,16 @@
         <div class="f-col">
             <a href="${pageContext.request.contextPath}/slots/manage">Manage Slots</a>
             <a href="${pageContext.request.contextPath}/admin/users">Manage Users</a>
+            <a href="${pageContext.request.contextPath}/payment/history">Payments</a>
+            <a href="${pageContext.request.contextPath}/tickets">Tickets</a>
         </div>
         <div class="f-col contact-info">
             <strong>Contact us:</strong>
-            <p>MyParking@gmail.com</p>
+            <p>ParkCity@gmail.com</p>
             <p>0712345678</p>
         </div>
     </div>
-    <p class="footer-copy">&copy; 2026 MyParking Smart System. All rights reserved.</p>
+    <p class="footer-copy">&copy; 2026 ParkCity Smart System. All rights reserved.</p>
 </footer>
 
 <script>
