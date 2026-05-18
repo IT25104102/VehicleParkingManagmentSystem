@@ -14,7 +14,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyParking | Admin Dashboard</title>
+    <title>ParkCity | Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css">
@@ -69,12 +69,9 @@
 </head>
 <body>
 
-<!-- Header -->
 <header class="main-header">
     <div class="top-bar">
-        <div class="logo">
-            <span class="logo-icon">&#10018;</span> MyParking
-        </div>
+        <div class="logo"><span class="logo-icon">&#10018;</span> ParkCity</div>
         <div class="header-controls">
             <span class="btn-sm" style="cursor:default;">Admin Panel</span>
             <a href="<%= request.getContextPath() %>/logout">
@@ -89,29 +86,24 @@
             <li><a href="<%= request.getContextPath() %>/admin/price">Pricing</a></li>
             <li><a href="<%= request.getContextPath() %>/slots/manage">Manage Slots</a></li>
             <li><a href="<%= request.getContextPath() %>/admin/users">Manage Users</a></li>
+            <li><a href="<%= request.getContextPath() %>/payment/history">Payments</a></li>
         </ul>
     </nav>
 </header>
 
 <div class="page-content">
-
     <div class="page-header">
         <h2>Dashboard Overview</h2>
         <p>Today: <%= new java.util.Date() %></p>
     </div>
 
     <% if (successMsg != null) { %>
-        <div class="flash flash-success">
-            <i class="fas fa-check-circle"></i> <%= successMsg %>
-        </div>
+        <div class="flash flash-success"><i class="fas fa-check-circle"></i> <%= successMsg %></div>
     <% } %>
     <% if (errorMsg != null) { %>
-        <div class="flash flash-error">
-            <i class="fas fa-exclamation-circle"></i> <%= errorMsg %>
-        </div>
+        <div class="flash flash-error"><i class="fas fa-exclamation-circle"></i> <%= errorMsg %></div>
     <% } %>
 
-    <!-- Stats -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="label">Total Users</div>
@@ -139,15 +131,12 @@
         </div>
     </div>
 
-    <!-- Actions -->
     <div class="actions-grid">
         <div class="action-card">
             <h5 class="c-green"><i class="fas fa-plus-circle"></i> Generate Summary</h5>
             <p>Create today's daily summary log entry with current vehicle counts, income, and slot availability.</p>
             <form method="post" action="<%= request.getContextPath() %>/admin/generate">
-                <button type="submit" class="btn-primary">
-                    <i class="fas fa-bolt"></i> Generate Now
-                </button>
+                <button type="submit" class="btn-primary"><i class="fas fa-bolt"></i> Generate Now</button>
             </form>
         </div>
         <div class="action-card">
@@ -160,14 +149,12 @@
         <div class="action-card">
             <h5 class="c-red"><i class="fas fa-trash-alt"></i> Clean Old Logs</h5>
             <p>Bulk delete log entries older than 30 days to keep logs.txt clean and the system fast.</p>
-            <button class="btn-danger"
-                onclick="document.getElementById('confirmModal').classList.add('show')">
+            <button class="btn-danger" onclick="document.getElementById('confirmModal').classList.add('show')">
                 <i class="fas fa-broom"></i> Run Cleanup
             </button>
         </div>
     </div>
 
-    <!-- Recent Logs -->
     <div class="card">
         <div class="card-header">
             <h5>Recent Log Entries</h5>
@@ -180,10 +167,7 @@
             Collections.reverse(recentLogs);
         %>
         <% if (recentLogs.isEmpty()) { %>
-            <div class="empty-state">
-                <i class="fas fa-file-alt"></i>
-                No log entries yet. Generate your first daily summary!
-            </div>
+            <div class="empty-state"><i class="fas fa-file-alt"></i> No log entries yet. Generate your first daily summary!</div>
         <% } else { %>
             <table>
                 <thead>
@@ -211,10 +195,8 @@
             </table>
         <% } %>
     </div>
-
 </div>
 
-<!-- Footer -->
 <footer class="layered-footer">
     <div class="footer-grid">
         <div class="f-col">
@@ -225,6 +207,7 @@
         <div class="f-col">
             <a href="<%= request.getContextPath() %>/slots/manage">Manage Slots</a>
             <a href="<%= request.getContextPath() %>/admin/users">Manage Users</a>
+            <a href="<%= request.getContextPath() %>/payment/history">Payments</a>
         </div>
         <div class="f-col contact-info">
             <strong>Contact us:</strong>
@@ -232,19 +215,15 @@
             <p>0712345678</p>
         </div>
     </div>
-    <p class="footer-copy">&copy; 2026 MyParking Smart System. All rights reserved.</p>
+    <p class="footer-copy">&copy; 2026 ParkCity Smart System. All rights reserved.</p>
 </footer>
 
-<!-- Cleanup Modal -->
 <div class="modal-overlay" id="confirmModal">
     <div class="modal-box">
         <h5>Confirm Log Cleanup</h5>
         <p>This will permanently delete all log entries older than <strong>30 days</strong>. This cannot be undone.</p>
         <div class="modal-actions">
-            <button class="btn-secondary"
-                onclick="document.getElementById('confirmModal').classList.remove('show')">
-                Cancel
-            </button>
+            <button class="btn-secondary" onclick="document.getElementById('confirmModal').classList.remove('show')">Cancel</button>
             <form method="post" action="<%= request.getContextPath() %>/admin/clean" style="display:inline;">
                 <button type="submit" class="btn-danger">Yes, Delete</button>
             </form>
