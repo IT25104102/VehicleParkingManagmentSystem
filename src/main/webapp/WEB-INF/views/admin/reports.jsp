@@ -268,8 +268,7 @@
 
 </div>
 
-<!-- Footer -->
-<footer class="layered-footer">
+ <footer class="layered-footer">
     <div class="footer-grid">
         <div class="f-col">
             <a href="<%= request.getContextPath() %>/admin/dashboard">Dashboard</a>
@@ -279,14 +278,16 @@
         <div class="f-col">
             <a href="<%= request.getContextPath() %>/slots/manage">Manage Slots</a>
             <a href="<%= request.getContextPath() %>/admin/users">Manage Users</a>
+            <a href="<%= request.getContextPath() %>/payment/history">Payments</a>
+            <a href="<%= request.getContextPath() %>/tickets">Tickets</a>
         </div>
         <div class="f-col contact-info">
             <strong>Contact us:</strong>
-            <p>MyParking@gmail.com</p>
+            <p>ParkCity@gmail.com</p>
             <p>0712345678</p>
         </div>
     </div>
-    <p class="footer-copy">&copy; 2026 MyParking Smart System. All rights reserved.</p>
+    <p class="footer-copy">&copy; 2026 ParkCity Smart System. All rights reserved.</p>
 </footer>
 
 <script>
