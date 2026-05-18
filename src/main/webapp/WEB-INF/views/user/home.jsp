@@ -31,7 +31,6 @@
                 <li><a href="${pageContext.request.contextPath}/home" class="active">Home</a></li>
                 <li><a href="${pageContext.request.contextPath}/slots">Parking Slots</a></li>
                 <li><a href="${pageContext.request.contextPath}/vehicle/list">My Vehicles</a></li>
-                <li><a href="${pageContext.request.contextPath}/tickets">Tickets</a></li>
                 <li><a href="${pageContext.request.contextPath}/payment/history">Payments</a></li>
                 <c:if test="${user.role == 'ADMIN'}">
                     <li><a href="${pageContext.request.contextPath}/admin/users">Manage Users</a></li>
