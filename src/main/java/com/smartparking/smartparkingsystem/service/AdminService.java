@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdminService {
-       private static final String BASE = "data/";
+
+    private static final String BASE          = "data/";
     private static final String LOGS_FILE     = BASE + "logs.txt";
     private static final String CONFIG_FILE   = BASE + "config.txt";
     private static final String USERS_FILE    = BASE + "users.txt";
@@ -23,25 +24,27 @@ public class AdminService {
     private static final DateTimeFormatter DATE_FMT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+    // Default rates
+    private static final double DEFAULT_BIKE          = 200.0;
+    private static final double DEFAULT_THREE_WHEELER = 250.0;
+    private static final double DEFAULT_CAR           = 350.0;
+    private static final double DEFAULT_VAN           = 550.0;
+    private static final double DEFAULT_VIP           = 800.0;
+
     // ═══════════════════════════════════════════════════
     // 1. CREATE — Generate Daily Summary
     // ═══════════════════════════════════════════════════
     public Log generateDailySummary() {
         try {
             String today = LocalDate.now().format(DATE_FMT);
-
-            List<String> ticketLines = FileUtil.readAll(TICKETS_FILE);
-            int totalVehicles = countNonEmpty(ticketLines);
-
+            List<String> ticketLines  = FileUtil.readAll(TICKETS_FILE);
+            int totalVehicles         = countNonEmpty(ticketLines);
             List<String> paymentLines = FileUtil.readAll(PAYMENTS_FILE);
-            double totalIncome = sumIncome(paymentLines);
-
-            List<String> slotLines = FileUtil.readAll(SLOTS_FILE);
-            int availableSlots = countAvailableSlots(slotLines);
-
+            double totalIncome        = sumIncome(paymentLines);
+            List<String> slotLines    = FileUtil.readAll(SLOTS_FILE);
+            int availableSlots        = countAvailableSlots(slotLines);
             Log log = new Log(today, totalVehicles, totalIncome, availableSlots);
             FileUtil.appendLine(LOGS_FILE, log.toString());
-
             return log;
         } catch (Exception e) {
             System.err.println("[AdminService] Error: " + e.getMessage());
@@ -54,7 +57,6 @@ public class AdminService {
     // ═══════════════════════════════════════════════════
     public SystemReport getSystemReport() {
         SystemReport report = new SystemReport();
-
         List<String> users    = FileUtil.readAll(USERS_FILE);
         List<String> vehicles = FileUtil.readAll(VEHICLES_FILE);
         List<String> slots    = FileUtil.readAll(SLOTS_FILE);
@@ -84,21 +86,86 @@ public class AdminService {
     }
 
     // ═══════════════════════════════════════════════════
-    // 3. UPDATE — Modify Price Per Hour
+    // 3. UPDATE — Get rate by vehicle type
     // ═══════════════════════════════════════════════════
-     public boolean updatePricePerHour(double newPrice) {
-    if (newPrice <= 0) return false;
-    try {
-        List<String> lines = new ArrayList<>();
-        lines.add("price=" + newPrice);
-        FileUtil.writeAll(CONFIG_FILE, lines);
-        return true;
-    } catch (Exception e) {
-        System.err.println("[AdminService] Error: " 
-            + e.getMessage());
-        return false;
+    public double getRateByType(String type) {
+        try {
+            List<String> lines = FileUtil.readAll(CONFIG_FILE);
+            String key = type.toLowerCase() + "_rate=";
+            for (String line : lines) {
+                if (line.toLowerCase().startsWith(key)) {
+                    return Double.parseDouble(
+                        line.substring(key.length()).trim());
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[AdminService] getRateByType error: " + e.getMessage());
+        }
+        // Return defaults if not found
+        switch (type.toUpperCase()) {
+            case "BIKE":          return DEFAULT_BIKE;
+            case "THREE_WHEELER": return DEFAULT_THREE_WHEELER;
+            case "CAR":           return DEFAULT_CAR;
+            case "VAN":           return DEFAULT_VAN;
+            case "VIP":           return DEFAULT_VIP;
+            default:              return DEFAULT_CAR;
+        }
     }
-}
+
+    // ═══════════════════════════════════════════════════
+    // 4. UPDATE — Save rate by vehicle type
+    // ═══════════════════════════════════════════════════
+    public boolean updateRateByType(String type, double newRate) {
+        if (newRate <= 0) return false;
+        try {
+            List<String> lines = FileUtil.readAll(CONFIG_FILE);
+            List<String> updated = new ArrayList<>();
+            String key = type.toLowerCase() + "_rate=";
+            boolean found = false;
+            for (String line : lines) {
+                if (line.toLowerCase().startsWith(key)) {
+                    updated.add(key + newRate);
+                    found = true;
+                } else {
+                    updated.add(line);
+                }
+            }
+            if (!found) {
+                updated.add(key + newRate);
+            }
+            FileUtil.writeAll(CONFIG_FILE, updated);
+            return true;
+        } catch (Exception e) {
+            System.err.println("[AdminService] updateRateByType error: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // ═══════════════════════════════════════════════════
+    // 5. UPDATE — Modify single Price Per Hour (legacy)
+    // ═══════════════════════════════════════════════════
+    public boolean updatePricePerHour(double newPrice) {
+        if (newPrice <= 0) return false;
+        try {
+            List<String> lines = FileUtil.readAll(CONFIG_FILE);
+            List<String> updated = new ArrayList<>();
+            boolean found = false;
+            for (String line : lines) {
+                if (line.startsWith("price=")) {
+                    updated.add("price=" + newPrice);
+                    found = true;
+                } else {
+                    updated.add(line);
+                }
+            }
+            if (!found) updated.add("price=" + newPrice);
+            FileUtil.writeAll(CONFIG_FILE, updated);
+            return true;
+        } catch (Exception e) {
+            System.err.println("[AdminService] Error: " + e.getMessage());
+            return false;
+        }
+    }
 
     public double getCurrentPrice() {
         try {
@@ -116,7 +183,7 @@ public class AdminService {
     }
 
     // ═══════════════════════════════════════════════════
-    // 4. DELETE — Remove Logs Older Than 30 Days
+    // 6. DELETE — Remove Logs Older Than 30 Days
     // ═══════════════════════════════════════════════════
     public int deleteOldLogs() {
         try {
@@ -124,7 +191,6 @@ public class AdminService {
             List<String> keepLines = new ArrayList<>();
             LocalDate cutoff = LocalDate.now().minus(30, ChronoUnit.DAYS);
             int deleted = 0;
-
             for (String line : allLines) {
                 if (line.trim().isEmpty()) continue;
                 Log log = Log.fromLine(line);
@@ -140,14 +206,8 @@ public class AdminService {
                     keepLines.add(line);
                 }
             }
-
-            StringBuilder sb = new StringBuilder();
-            for (String line : keepLines) {
-                sb.append(line).append("\n");
-            } 
-               FileUtil.writeAll(LOGS_FILE, keepLines);
+            FileUtil.writeAll(LOGS_FILE, keepLines);
             return deleted;
-
         } catch (Exception e) {
             System.err.println("[AdminService] Error: " + e.getMessage());
             return -1;
@@ -208,37 +268,37 @@ public class AdminService {
         private List<String> paymentLines = new ArrayList<>();
         private List<String> logLines     = new ArrayList<>();
 
-        public int    getTotalUsers()          { return totalUsers; }
-        public void   setTotalUsers(int v)     { this.totalUsers = v; }
-        public int    getTotalVehicles()       { return totalVehicles; }
-        public void   setTotalVehicles(int v)  { this.totalVehicles = v; }
-        public int    getTotalSlots()          { return totalSlots; }
-        public void   setTotalSlots(int v)     { this.totalSlots = v; }
-        public int    getAvailableSlots()      { return availableSlots; }
-        public void   setAvailableSlots(int v) { this.availableSlots = v; }
-        public int    getOccupiedSlots()       { return occupiedSlots; }
-        public void   setOccupiedSlots(int v)  { this.occupiedSlots = v; }
-        public int    getActiveTickets()       { return activeTickets; }
-        public void   setActiveTickets(int v)  { this.activeTickets = v; }
-        public int    getTotalPayments()       { return totalPayments; }
-        public void   setTotalPayments(int v)  { this.totalPayments = v; }
-        public double getTotalIncome()         { return totalIncome; }
-        public void   setTotalIncome(double v) { this.totalIncome = v; }
-        public int    getTotalLogs()           { return totalLogs; }
-        public void   setTotalLogs(int v)      { this.totalLogs = v; }
-        public double getCurrentPrice()        { return currentPrice; }
-        public void   setCurrentPrice(double v){ this.currentPrice = v; }
-        public List<String> getUserLines()           { return userLines; }
+        public int    getTotalUsers()                       { return totalUsers; }
+        public void   setTotalUsers(int v)                  { this.totalUsers = v; }
+        public int    getTotalVehicles()                    { return totalVehicles; }
+        public void   setTotalVehicles(int v)               { this.totalVehicles = v; }
+        public int    getTotalSlots()                       { return totalSlots; }
+        public void   setTotalSlots(int v)                  { this.totalSlots = v; }
+        public int    getAvailableSlots()                   { return availableSlots; }
+        public void   setAvailableSlots(int v)              { this.availableSlots = v; }
+        public int    getOccupiedSlots()                    { return occupiedSlots; }
+        public void   setOccupiedSlots(int v)               { this.occupiedSlots = v; }
+        public int    getActiveTickets()                    { return activeTickets; }
+        public void   setActiveTickets(int v)               { this.activeTickets = v; }
+        public int    getTotalPayments()                    { return totalPayments; }
+        public void   setTotalPayments(int v)               { this.totalPayments = v; }
+        public double getTotalIncome()                      { return totalIncome; }
+        public void   setTotalIncome(double v)              { this.totalIncome = v; }
+        public int    getTotalLogs()                        { return totalLogs; }
+        public void   setTotalLogs(int v)                   { this.totalLogs = v; }
+        public double getCurrentPrice()                     { return currentPrice; }
+        public void   setCurrentPrice(double v)             { this.currentPrice = v; }
+        public List<String> getUserLines()                  { return userLines; }
         public void         setUserLines(List<String> l)    { this.userLines = l; }
-        public List<String> getVehicleLines()        { return vehicleLines; }
+        public List<String> getVehicleLines()               { return vehicleLines; }
         public void         setVehicleLines(List<String> l) { this.vehicleLines = l; }
-        public List<String> getSlotLines()           { return slotLines; }
+        public List<String> getSlotLines()                  { return slotLines; }
         public void         setSlotLines(List<String> l)    { this.slotLines = l; }
-        public List<String> getTicketLines()         { return ticketLines; }
+        public List<String> getTicketLines()                { return ticketLines; }
         public void         setTicketLines(List<String> l)  { this.ticketLines = l; }
-        public List<String> getPaymentLines()        { return paymentLines; }
+        public List<String> getPaymentLines()               { return paymentLines; }
         public void         setPaymentLines(List<String> l) { this.paymentLines = l; }
-        public List<String> getLogLines()            { return logLines; }
+        public List<String> getLogLines()                   { return logLines; }
         public void         setLogLines(List<String> l)     { this.logLines = l; }
     }
 }
