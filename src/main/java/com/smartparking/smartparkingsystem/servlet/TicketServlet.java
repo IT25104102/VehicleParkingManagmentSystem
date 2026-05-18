@@ -1,8 +1,10 @@
 package com.smartparking.smartparkingsystem.servlet;
 
 import com.smartparking.smartparkingsystem.model.Ticket;
+import com.smartparking.smartparkingsystem.model.User;
 import com.smartparking.smartparkingsystem.service.AdminService;
 import com.smartparking.smartparkingsystem.service.TicketService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,15 +20,19 @@ public class TicketServlet {
 
     private AdminService adminService = new AdminService();
 
-    // READ — List all active tickets
+    // READ — List all tickets — ADMIN ONLY
     @GetMapping("/tickets")
-    public String listTickets(Model model) {
+    public String listTickets(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) return "redirect:/login";
+        if (!"ADMIN".equals(user.getRole())) return "redirect:/home";
+
         List<Ticket> active = ticketService.getActiveTickets();
-        List<Ticket> all = ticketService.getAllTickets();
-        model.addAttribute("tickets", active);
-        model.addAttribute("activeCount", active.size());
-        model.addAttribute("totalCount", all.size());
-        model.addAttribute("voidedCount", all.stream()
+        List<Ticket> all    = ticketService.getAllTickets();
+        model.addAttribute("tickets",      active);
+        model.addAttribute("activeCount",  active.size());
+        model.addAttribute("totalCount",   all.size());
+        model.addAttribute("voidedCount",  all.stream()
                 .filter(t -> "VOIDED".equals(t.getStatus())).count());
         return "tickets/ticket-list";
     }
@@ -42,20 +48,20 @@ public class TicketServlet {
             @RequestParam(required = false) String date,
             Model model) {
 
-        model.addAttribute("vehicleId",    vehicleId);
-        model.addAttribute("slotId",       slotId);
-        model.addAttribute("slotNumber",   slotNumber);
+        model.addAttribute("vehicleId",     vehicleId);
+        model.addAttribute("slotId",        slotId);
+        model.addAttribute("slotNumber",    slotNumber);
         model.addAttribute("vehicleNumber", vehicleNumber);
-        model.addAttribute("ownerName",    ownerName);
-        model.addAttribute("date",         date);
-        model.addAttribute("pageTitle",    "Generate Ticket");
+        model.addAttribute("ownerName",     ownerName);
+        model.addAttribute("date",          date);
+        model.addAttribute("pageTitle",     "Generate Ticket");
 
         // Load rates from config
         model.addAttribute("bikeRate",         (int) adminService.getRateByType("BIKE"));
-model.addAttribute("threeWheelerRate", (int) adminService.getRateByType("THREE_WHEELER"));
-model.addAttribute("carRate",          (int) adminService.getRateByType("CAR"));
-model.addAttribute("vanRate",          (int) adminService.getRateByType("VAN"));
-model.addAttribute("vipRate",          (int) adminService.getRateByType("VIP"));
+        model.addAttribute("threeWheelerRate", (int) adminService.getRateByType("THREE_WHEELER"));
+        model.addAttribute("carRate",          (int) adminService.getRateByType("CAR"));
+        model.addAttribute("vanRate",          (int) adminService.getRateByType("VAN"));
+        model.addAttribute("vipRate",          (int) adminService.getRateByType("VIP"));
 
         return "tickets/ticket-form";
     }
@@ -74,8 +80,7 @@ model.addAttribute("vipRate",          (int) adminService.getRateByType("VIP"));
             @RequestParam(required = false) String date,
             RedirectAttributes ra) {
 
-        Ticket ticket = ticketService.generateTicket(
-                vehicleId, slotId, vehicleNumber);
+        Ticket ticket = ticketService.generateTicket(vehicleId, slotId, vehicleNumber);
 
         return "redirect:/payment/create"
                 + "?ticketId="      + ticket.getId()
@@ -90,7 +95,7 @@ model.addAttribute("vipRate",          (int) adminService.getRateByType("VIP"));
                 + "&date="          + (date != null ? date : "");
     }
 
-    // READ — View single ticket details
+    // READ — View single ticket
     @GetMapping("/tickets/{id}")
     public String viewTicket(@PathVariable String id, Model model) {
         Ticket ticket = ticketService.findById(id);
@@ -112,10 +117,9 @@ model.addAttribute("vipRate",          (int) adminService.getRateByType("VIP"));
 
     // UPDATE — Process slot reassignment
     @PostMapping("/tickets/{id}/update")
-    public String updateTicket(
-            @PathVariable String id,
-            @RequestParam String newSlotId,
-            RedirectAttributes ra) {
+    public String updateTicket(@PathVariable String id,
+                               @RequestParam String newSlotId,
+                               RedirectAttributes ra) {
         boolean ok = ticketService.updateTicketSlot(id, newSlotId);
         if (ok) {
             ra.addFlashAttribute("successMsg", "Slot updated successfully!");
