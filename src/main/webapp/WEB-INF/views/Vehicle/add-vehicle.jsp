@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MyParking | Add Vehicle</title>
+    <title>ParkCity | Add Vehicle</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
@@ -14,12 +14,18 @@
             border: 1px solid rgba(26,217,240,0.3);
             border-radius: 12px; padding: 1rem 1.5rem;
             margin-bottom: 2rem;
-            display: flex; align-items: center; gap: 1rem;
+            display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
         }
         .slot-badge {
             background: var(--btn-neon); color: #0a1128;
             padding: 4px 16px; border-radius: 20px;
             font-weight: 800; font-size: 1rem;
+        }
+        .date-badge {
+            background: rgba(26,217,240,0.15); color: var(--cyan);
+            padding: 4px 16px; border-radius: 20px;
+            font-weight: 700; font-size: 0.85rem;
+            border: 1px solid rgba(26,217,240,0.3);
         }
     </style>
 </head>
@@ -27,7 +33,7 @@
 
 <header class="main-header">
     <div class="top-bar">
-        <div class="logo"><span class="logo-icon">&#10018;</span> MyParking</div>
+        <div class="logo"><span class="logo-icon">&#10018;</span> ParkCity</div>
         <div class="header-controls">
             <a href="${pageContext.request.contextPath}/profile">
                 <button class="btn-sm">${sessionScope.loggedInUser.name}</button>
@@ -52,13 +58,16 @@
 
     <div class="page-hdr" style="margin-bottom:1.5rem;">
         <h1>Add Vehicle</h1>
-        <p>Register a new vehicle in the MyParking system</p>
+        <p>Register a new vehicle in the ParkCity system</p>
     </div>
 
-    <%-- Show slot info if came from slot selection --%>
+    <%-- Show slot + date info if came from slot selection --%>
     <c:if test="${not empty slotId}">
         <div class="slot-info-bar">
             <span class="slot-badge">${slotNumber}</span>
+            <c:if test="${not empty date}">
+                <span class="date-badge">📅 ${date}</span>
+            </c:if>
             <p style="color:var(--text-dim);margin:0;">
                 Adding vehicle for this slot &nbsp;·&nbsp;
                 Type: <strong style="color:var(--text-main);">${slotType}</strong>
@@ -69,10 +78,11 @@
     <div class="d-card" style="max-width:600px;">
         <form action="${pageContext.request.contextPath}/vehicle/add" method="post">
 
-            <%-- Hidden fields — pass slot info through form --%>
+            <%-- Hidden fields — pass slot info and date through form --%>
             <input type="hidden" name="slotId"     value="${slotId}"/>
             <input type="hidden" name="slotNumber" value="${slotNumber}"/>
             <input type="hidden" name="slotType"   value="${slotType}"/>
+            <input type="hidden" name="date"       value="${date}"/>
             <input type="hidden" name="userId"     value="${sessionScope.loggedInUser.id}"/>
 
             <div class="form-group">
@@ -110,7 +120,7 @@
                 <button type="submit" class="btn-update">Save Vehicle</button>
                 <c:choose>
                     <c:when test="${not empty slotId}">
-                        <a href="${pageContext.request.contextPath}/vehicle/select?slotId=${slotId}&slotNumber=${slotNumber}&slotType=${slotType}">
+                        <a href="${pageContext.request.contextPath}/vehicle/select?slotId=${slotId}&slotNumber=${slotNumber}&slotType=${slotType}&date=${date}">
                             <button type="button" class="btn-danger">Cancel</button>
                         </a>
                     </c:when>
@@ -142,7 +152,7 @@
         </div>
         <div class="f-col contact-info">
             <strong>Contact us:</strong>
-            <p>MyParking@gmail.com</p>
+            <p>ParkCity@gmail.com</p>
             <p>0712345678</p>
         </div>
     </div>
