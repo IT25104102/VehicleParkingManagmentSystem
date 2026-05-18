@@ -1,1 +1,6 @@
-price = 150.0
+price=150.0
+bike_rate=200.0
+three_wheeler_rate=250.0
+car_rate=350.0
+van_rate=550.0
+vip_rate=800.0
