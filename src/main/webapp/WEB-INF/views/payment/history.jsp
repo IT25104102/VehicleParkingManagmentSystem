@@ -5,58 +5,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyParking | Payment History</title>
+    <title>ParkCity | Payment History</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
         .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
         .page-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 6px; }
         .page-sub { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 30px; }
-        .card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px; padding: 24px; margin-bottom: 20px;
-        }
-        .card-title {
-            font-size: 0.75rem; font-weight: 600;
-            color: var(--text-dim); text-transform: uppercase;
-            letter-spacing: 1px; margin-bottom: 16px;
-        }
+        .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+        .card-title { font-size: 0.75rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         thead tr { border-bottom: 1px solid rgba(26,217,240,0.3); }
-        thead th {
-            padding: 12px 10px; color: var(--text-dim);
-            font-weight: 600; text-align: left;
-            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;
-        }
+        thead th { padding: 12px 10px; color: var(--text-dim); font-weight: 600; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
         tbody tr { border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
         tbody tr:hover { background: rgba(255,255,255,0.03); }
         tbody td { padding: 12px 10px; color: var(--text-main); }
         .badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
-        .badge-pending { background: rgba(239,159,39,0.15); color: #EF9F27; border: 1px solid rgba(239,159,39,0.3); }
+        .badge-pending   { background: rgba(239,159,39,0.15); color: #EF9F27; border: 1px solid rgba(239,159,39,0.3); }
         .badge-completed { background: rgba(55,255,139,0.12); color: #37ff8b; border: 1px solid rgba(55,255,139,0.3); }
         .action-form { display: inline; }
-        .btn-update {
-            background: rgba(26,217,240,0.1); border: 1px solid rgba(26,217,240,0.3);
-            border-radius: 8px; padding: 5px 10px;
-            font-family: 'Montserrat',sans-serif; font-size: 0.75rem;
-            color: #1ad9f0; cursor: pointer; transition: 0.3s;
-        }
+        .btn-update { background: rgba(26,217,240,0.1); border: 1px solid rgba(26,217,240,0.3); border-radius: 8px; padding: 5px 10px; font-family: 'Montserrat',sans-serif; font-size: 0.75rem; color: #1ad9f0; cursor: pointer; transition: 0.3s; }
         .btn-update:hover { background: rgba(26,217,240,0.2); }
-        .btn-delete {
-            background: rgba(220,53,69,0.1); border: 1px solid rgba(220,53,69,0.3);
-            border-radius: 8px; padding: 5px 10px;
-            font-family: 'Montserrat',sans-serif; font-size: 0.75rem;
-            color: #ff6b6b; cursor: pointer; transition: 0.3s; margin-top: 6px;
-        }
+        .btn-delete { background: rgba(220,53,69,0.1); border: 1px solid rgba(220,53,69,0.3); border-radius: 8px; padding: 5px 10px; font-family: 'Montserrat',sans-serif; font-size: 0.75rem; color: #ff6b6b; cursor: pointer; transition: 0.3s; margin-top: 6px; }
         .btn-delete:hover { background: rgba(220,53,69,0.2); }
-        select {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px; padding: 4px 8px;
-            color: var(--text-main);
-            font-family: 'Montserrat',sans-serif; font-size: 0.75rem;
-        }
+        select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 4px 8px; color: var(--text-main); font-family: 'Montserrat',sans-serif; font-size: 0.75rem; }
         select option { background: #0a1128; }
         .empty-state { text-align: center; padding: 40px; color: var(--text-dim); }
         .empty-state .empty-icon { font-size: 3rem; margin-bottom: 16px; }
@@ -64,9 +36,10 @@
 </head>
 <body>
 
+<!-- Header -->
 <header class="main-header">
     <div class="top-bar">
-        <div class="logo"><span class="logo-icon">&#10018;</span> MyParking</div>
+        <div class="logo"><span class="logo-icon">&#10018;</span> ParkCity</div>
         <div class="header-controls">
             <c:choose>
                 <c:when test="${userRole == 'ADMIN'}">
@@ -104,7 +77,6 @@
                     <li><a href="${pageContext.request.contextPath}/home">Home</a></li>
                     <li><a href="${pageContext.request.contextPath}/slots">Parking Slots</a></li>
                     <li><a href="${pageContext.request.contextPath}/vehicle/list">My Vehicles</a></li>
-                    <li><a href="${pageContext.request.contextPath}/tickets">Tickets</a></li>
                     <li><a href="${pageContext.request.contextPath}/payment/history" class="active">Payments</a></li>
                 </ul>
             </c:otherwise>
@@ -151,7 +123,6 @@
                             <th>Method</th>
                             <th>Status</th>
                             <th>Date</th>
-                            <%-- Show Actions column only for admin --%>
                             <c:if test="${userRole == 'ADMIN'}">
                                 <th>Actions</th>
                             </c:if>
@@ -170,7 +141,6 @@
                                     </span>
                                 </td>
                                 <td>${payment.createdAt}</td>
-                                <%-- Actions only for admin --%>
                                 <c:if test="${userRole == 'ADMIN'}">
                                     <td>
                                         <form method="post"
@@ -178,8 +148,8 @@
                                               class="action-form">
                                             <input type="hidden" name="id" value="${payment.id}"/>
                                             <select name="status">
-                                                <option value="PENDING" ${payment.status=='PENDING'?'selected':''}>Pending</option>
-                                                <option value="COMPLETED" ${payment.status=='COMPLETED'?'selected':''}>Completed</option>
+                                                <option value="PENDING"   ${payment.status=='PENDING'   ?'selected':''}>Pending</option>
+                                                <option value="COMPLETED" ${payment.status=='COMPLETED' ?'selected':''}>Completed</option>
                                             </select>
                                             <button type="submit" class="btn-update">Update</button>
                                         </form>
@@ -203,27 +173,54 @@
     </div>
 </div>
 
- <footer class="layered-footer">
-    <div class="footer-grid">
-        <div class="f-col">
-            <a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a>
-            <a href="${pageContext.request.contextPath}/admin/reports">Reports</a>
-            <a href="${pageContext.request.contextPath}/admin/price">Pricing</a>
-        </div>
-        <div class="f-col">
-            <a href="${pageContext.request.contextPath}/slots/manage">Manage Slots</a>
-            <a href="${pageContext.request.contextPath}/admin/users">Manage Users</a>
-            <a href="${pageContext.request.contextPath}/payment/history">Payments</a>
-            <a href="${pageContext.request.contextPath}/tickets">Tickets</a>
-        </div>
-        <div class="f-col contact-info">
-            <strong>Contact us:</strong>
-            <p>ParkCity@gmail.com</p>
-            <p>0712345678</p>
-        </div>
-    </div>
-    <p class="footer-copy">&copy; 2026 ParkCity Smart System. All rights reserved.</p>
-</footer>
+<!-- Role based footer -->
+<c:choose>
+    <c:when test="${userRole == 'ADMIN'}">
+        <footer class="layered-footer">
+            <div class="footer-grid">
+                <div class="f-col">
+                    <a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a>
+                    <a href="${pageContext.request.contextPath}/admin/reports">Reports</a>
+                    <a href="${pageContext.request.contextPath}/admin/price">Pricing</a>
+                </div>
+                <div class="f-col">
+                    <a href="${pageContext.request.contextPath}/slots/manage">Manage Slots</a>
+                    <a href="${pageContext.request.contextPath}/admin/users">Manage Users</a>
+                    <a href="${pageContext.request.contextPath}/payment/history">Payments</a>
+                    <a href="${pageContext.request.contextPath}/tickets">Tickets</a>
+                </div>
+                <div class="f-col contact-info">
+                    <strong>Contact us:</strong>
+                    <p>ParkCity@gmail.com</p>
+                    <p>0712345678</p>
+                </div>
+            </div>
+            <p class="footer-copy">&copy; 2026 ParkCity Smart System. All rights reserved.</p>
+        </footer>
+    </c:when>
+    <c:otherwise>
+        <footer class="layered-footer">
+            <div class="footer-grid">
+                <div class="f-col">
+                    <a href="${pageContext.request.contextPath}/home">Home</a>
+                    <a href="#">About</a>
+                    <a href="#">Help</a>
+                </div>
+                <div class="f-col">
+                    <a href="${pageContext.request.contextPath}/slots">Parking Slots</a>
+                    <a href="${pageContext.request.contextPath}/vehicle/list">My Vehicles</a>
+                    <a href="${pageContext.request.contextPath}/payment/history">Payments</a>
+                </div>
+                <div class="f-col contact-info">
+                    <strong>Contact us:</strong>
+                    <p>ParkCity@gmail.com</p>
+                    <p>0712345678</p>
+                </div>
+            </div>
+            <p class="footer-copy">&copy; 2026 ParkCity Smart System. All rights reserved.</p>
+        </footer>
+    </c:otherwise>
+</c:choose>
 
 </body>
 </html>
