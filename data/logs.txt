@@ -1,1 +1,3 @@
-
+2026-05-18 | Total Vehicles: 18 | Income: Rs.22500.0 | Available Slots: 435
+2026-05-19 | Total Vehicles: 21 | Income: Rs.25950.0 | Available Slots: 432
+2026-05-19 | Total Vehicles: 25 | Income: Rs.33150.0 | Available Slots: 428
